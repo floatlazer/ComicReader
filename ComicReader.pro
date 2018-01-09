@@ -32,3 +32,6 @@ HEADERS += \
 
 FORMS += \
         comicreader.ui
+
+RESOURCES += \
+    res.qrc
