@@ -18,24 +18,27 @@ ComicReader::~ComicReader()
 
 void ComicReader::createActions()
 {
-    QMenu * mainMenu = menuBar()->addMenu(tr("&Control"));
-    QToolBar *mainToolBar = addToolBar(tr("Control"));
+    // Create column "Control" in the menubar and create a control toolbar
+    QMenu * controlMenu = menuBar()->addMenu(tr("&Control"));
+    QToolBar *controlToolBar = addToolBar(tr("Control"));
 
+    // Previous page action
     const QIcon prevIcon = QIcon::fromTheme("document-new", QIcon(":/icon/leftArrow.png"));
     QAction *prevAct = new QAction(prevIcon, tr("&Previous page"), this);
     prevAct->setShortcuts(QKeySequence::MoveToPreviousChar);
     prevAct->setStatusTip(tr("Previous page"));
     connect(prevAct, &QAction::triggered, this, &ComicReader::prevPage);
-    mainMenu->addAction(prevAct);
-    mainToolBar->addAction(prevAct);
+    controlMenu->addAction(prevAct);
+    controlToolBar->addAction(prevAct);
 
+    // Next page action
     const QIcon nextIcon = QIcon::fromTheme("document-new", QIcon(":/icon/rightArrow.png"));
     QAction *nextAct = new QAction(nextIcon, tr("&Next page"), this);
     nextAct->setShortcuts(QKeySequence::MoveToNextChar);
     nextAct->setStatusTip(tr("Next page"));
     connect(nextAct, &QAction::triggered, this, &ComicReader::nextPage);
-    mainMenu->addAction(nextAct);
-    mainToolBar->addAction(nextAct);
+    controlMenu->addAction(nextAct);
+    controlToolBar->addAction(nextAct);
 }
 
 
