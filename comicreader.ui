@@ -14,39 +14,13 @@
    <string>ComicReader</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <widget class="QWidget" name="horizontalLayoutWidget">
-    <property name="geometry">
-     <rect>
-      <x>0</x>
-      <y>380</y>
-      <width>611</width>
-      <height>71</height>
-     </rect>
-    </property>
-    <layout class="QHBoxLayout" name="horizontalLayout_2">
-     <item>
-      <widget class="QPushButton" name="pushButton_left">
-       <property name="text">
-        <string>&lt;&lt;</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pushButton_right">
-       <property name="text">
-        <string>&gt;&gt;</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </widget>
    <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
-      <x>80</x>
+      <x>20</x>
       <y>10</y>
-      <width>451</width>
-      <height>331</height>
+      <width>571</width>
+      <height>421</height>
      </rect>
     </property>
     <property name="text">

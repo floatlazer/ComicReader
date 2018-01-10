@@ -15,16 +15,14 @@ public:
     explicit ComicReader(QWidget *parent = 0);
     ~ComicReader();
 
-private slots:
-    void on_pushButton_left_clicked();
-
-    void on_pushButton_right_clicked();
-
 private:
     Ui::ComicReader *ui;
     void loadAndShowImage(QString fileName);
+    void createActions();
     QImage currentImage;
     QPixmap currentPixmap;
+    void prevPage();
+    void nextPage();
 };
 
 #endif // COMICREADER_H
