@@ -2,6 +2,7 @@
     <qresource prefix="/test">
         <file>000.jpg</file>
         <file>001.jpg</file>
+        <file>002.jpg</file>
     </qresource>
     <qresource prefix="/icon">
         <file>rightArrow.png</file>

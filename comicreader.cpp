@@ -6,8 +6,9 @@ ComicReader::ComicReader(QWidget *parent) :
     ui(new Ui::ComicReader)
 {
     ui->setupUi(this);
+    createActions();
     loadImages();
-    createActions();    
+    showImage();
 }
 
 ComicReader::~ComicReader()
@@ -51,8 +52,10 @@ void ComicReader::showImage()
 // Load image to imageVector
 void ComicReader::loadImages()
 {
-    imageVector.push_back(new QImage(":/test/000.jpg"));
-    imageVector.push_back(new QImage(":/test/001.jpg"));
+    imageVector.append(*(new QImage(":/test/000.jpg")));
+    imageVector.append(*(new QImage(":/test/001.jpg")));
+    imageVector.append(*(new QImage(":/test/002.jpg")));
+
     imageIterator = imageVector.begin();
 }
 
@@ -66,18 +69,18 @@ void ComicReader::prevPage()
 
 void ComicReader::nextPage()
 {
-    if(imageIterator != imageVector.end())
+    if(imageIterator < imageVector.end()-1)
     {
         imageIterator++;
         showImage();
     }
 }
 
-// Free image vector and its images
+// Free images in imageVector
 void ComicReader::freeImageVector()
 {
-    for(QVector::Iterator it = imageVector.begin(); it != imageVector.end(); it++)
+    for(QVector<QImage>::Iterator it = imageVector.begin(); it != imageVector.end(); it++)
     {
-        delete it;
+        it->~QImage();
     }
 }
