@@ -6,13 +6,13 @@ ComicReader::ComicReader(QWidget *parent) :
     ui(new Ui::ComicReader)
 {
     ui->setupUi(this);
-
-    loadAndShowImage(":/test/000.jpg"); // Load and show a test image loaded in the resources
-    createActions();
+    loadImages();
+    createActions();    
 }
 
 ComicReader::~ComicReader()
 {
+    freeImageVector();
     delete ui;
 }
 
@@ -42,20 +42,42 @@ void ComicReader::createActions()
 }
 
 
-void ComicReader::loadAndShowImage(QString fileName)
+void ComicReader::showImage()
 {
-    currentImage.load(fileName); // Load an image file
-    // TODO: Possible image processing goes here...
-    currentPixmap.convertFromImage(currentImage);
+    currentPixmap.convertFromImage(*imageIterator);
     ui->label->setPixmap(currentPixmap); // Load image to the label
+}
+
+// Load image to imageVector
+void ComicReader::loadImages()
+{
+    imageVector.push_back(new QImage(":/test/000.jpg"));
+    imageVector.push_back(new QImage(":/test/001.jpg"));
+    imageIterator = imageVector.begin();
 }
 
 void ComicReader::prevPage()
 {
-    loadAndShowImage(":/test/000.jpg");
-}
+    if(imageIterator != imageVector.begin())
+    {
+        imageIterator--;
+        showImage();}
+    }
 
 void ComicReader::nextPage()
 {
-    loadAndShowImage(":/test/001.jpg");
+    if(imageIterator != imageVector.end())
+    {
+        imageIterator++;
+        showImage();
+    }
+}
+
+// Free image vector and its images
+void ComicReader::freeImageVector()
+{
+    for(QVector::Iterator it = imageVector.begin(); it != imageVector.end(); it++)
+    {
+        delete it;
+    }
 }

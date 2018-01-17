@@ -2,6 +2,7 @@
 #define COMICREADER_H
 
 #include <QMainWindow>
+#include <QVector>
 
 namespace Ui {
 class ComicReader;
@@ -15,14 +16,19 @@ public:
     explicit ComicReader(QWidget *parent = 0);
     ~ComicReader();
 
-private:
-    Ui::ComicReader *ui;
-    void loadAndShowImage(QString fileName);
-    void createActions();
-    QImage currentImage;
-    QPixmap currentPixmap;
+public slots:
     void prevPage();
     void nextPage();
+
+private:
+    Ui::ComicReader *ui;
+    void createActions();
+    void loadImages();
+    void showImage();
+    void freeImageVector();
+    QVector<QImage> imageVector; // The vector of loaded images
+    QVector<QImage>::Iterator imageIterator;
+    QPixmap currentPixmap;
 };
 
 #endif // COMICREADER_H
