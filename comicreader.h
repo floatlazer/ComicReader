@@ -3,7 +3,7 @@
 
 #include <QMainWindow>
 #include <QVector>
-
+#include <QLabel>
 namespace Ui {
 class ComicReader;
 }
@@ -29,6 +29,10 @@ private:
     QVector<QImage> imageVector; // The vector of loaded images
     QVector<QImage>::Iterator imageIterator;
     QPixmap currentPixmap;
+    QLabel* centerLabel;
+
+protected:
+    virtual void resizeEvent(QResizeEvent *event); // Functiion called when we resize the mainWindow
 };
 
 #endif // COMICREADER_H

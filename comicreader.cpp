@@ -6,6 +6,7 @@ ComicReader::ComicReader(QWidget *parent) :
     ui(new Ui::ComicReader)
 {
     ui->setupUi(this);
+    centerLabel = ui->label;
     createActions();
     loadImages();
     showImage();
@@ -15,6 +16,14 @@ ComicReader::~ComicReader()
 {
     freeImageVector();
     delete ui;
+}
+
+void ComicReader::resizeEvent(QResizeEvent *event)
+{
+    int w = ui->centralWidget->size().width();
+    int h = ui->centralWidget->size().height();
+    centerLabel->resize(w,h); // resize center label
+    showImage();
 }
 
 void ComicReader::createActions()
@@ -46,7 +55,9 @@ void ComicReader::createActions()
 void ComicReader::showImage()
 {
     currentPixmap.convertFromImage(*imageIterator);
-    ui->label->setPixmap(currentPixmap); // Load image to the label
+    int w = centerLabel->size().width();
+    int h = centerLabel->size().height();
+    centerLabel->setPixmap(currentPixmap.scaled(w, h, Qt::KeepAspectRatio)); // Load image to the label and resize it to the size of label
 }
 
 // Load image to imageVector
