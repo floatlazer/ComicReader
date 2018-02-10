@@ -7,5 +7,6 @@
     <qresource prefix="/icon">
         <file>rightArrow.png</file>
         <file>leftArrow.png</file>
+        <file>doubleArrow.png</file>
     </qresource>
 </RCC>
