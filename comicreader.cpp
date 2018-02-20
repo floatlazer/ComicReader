@@ -7,8 +7,16 @@ ComicReader::ComicReader(QWidget *parent) :
 {
     ui->setupUi(this);
     centerLabel = ui->centerLabel;
+    centerScrollArea = ui->centerScrollArea;
     sideLabel = ui->sideLabel;
-    setUpCenterWidget();
+    scaleFactor = 1.0;
+    centerLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+    centerLabel->setScaledContents(true);
+    createActions();
+    sideLabel->setVisible(false);
+    loadImages();
+    setImage();
+    normalSize();
 }
 
 ComicReader::~ComicReader()
@@ -17,29 +25,24 @@ ComicReader::~ComicReader()
     delete ui;
 }
 
-void ComicReader::resizeEvent(QResizeEvent *event)
-{
-    resizeLabels();
-    showImage();
-}
-
 void ComicReader::createActions()
 {
-    // Create column "Control" in the menubar and create a control toolbar
+    // Create column "Control" and "View" in the menubar and create a control toolbar
     QMenu * controlMenu = menuBar()->addMenu(tr("&Control"));
+    QMenu * viewMenu = menuBar()->addMenu(tr("&View"));
     QToolBar *controlToolBar = addToolBar(tr("Control"));
 
     // Trigger hide/show sideLabel action
     const QIcon triggerIcon = QIcon::fromTheme("document-new", QIcon(":/icon/doubleArrow.png"));
-    QAction *triggerAct = new QAction(triggerIcon, tr("&Show/hide side label"), this);
+    triggerAct = new QAction(triggerIcon, tr("&Show/hide side label"), this);
     triggerAct->setStatusTip(tr("Show/hide side label"));
     connect(triggerAct, &QAction::triggered, this, &ComicReader::triggerSideLabel);
-    controlMenu->addAction(triggerAct);
+    viewMenu->addAction(triggerAct);
     controlToolBar->addAction(triggerAct);
 
     // Previous page action
     const QIcon prevIcon = QIcon::fromTheme("document-new", QIcon(":/icon/leftArrow.png"));
-    QAction *prevAct = new QAction(prevIcon, tr("&Previous page"), this);
+    prevAct = new QAction(prevIcon, tr("&Previous page"), this);
     prevAct->setShortcuts(QKeySequence::MoveToPreviousChar);
     prevAct->setStatusTip(tr("Previous page"));
     connect(prevAct, &QAction::triggered, this, &ComicReader::prevPage);
@@ -48,20 +51,83 @@ void ComicReader::createActions()
 
     // Next page action
     const QIcon nextIcon = QIcon::fromTheme("document-new", QIcon(":/icon/rightArrow.png"));
-    QAction *nextAct = new QAction(nextIcon, tr("&Next page"), this);
+    nextAct = new QAction(nextIcon, tr("&Next page"), this);
     nextAct->setShortcuts(QKeySequence::MoveToNextChar);
     nextAct->setStatusTip(tr("Next page"));
     connect(nextAct, &QAction::triggered, this, &ComicReader::nextPage);
     controlMenu->addAction(nextAct);
     controlToolBar->addAction(nextAct);
+
+    // ZoomIn action
+    const QIcon zoomInIcon = QIcon::fromTheme("document-new", QIcon(":/icon/zoomIn.png"));
+    zoomInAct = new QAction(zoomInIcon, tr("&Zoom in"), this);
+    zoomInAct->setShortcuts(QKeySequence::ZoomIn);
+    zoomInAct->setStatusTip(tr("Zoom In"));
+    connect(zoomInAct, &QAction::triggered, this, &ComicReader::zoomIn);
+    viewMenu->addAction(zoomInAct);
+    controlToolBar->addAction(zoomInAct);
+
+    // ZoomOut action
+    const QIcon zoomOutIcon = QIcon::fromTheme("document-new", QIcon(":/icon/zoomOut.png"));
+    zoomOutAct = new QAction(zoomOutIcon, tr("&Zoom out"), this);
+    zoomOutAct->setShortcuts(QKeySequence::ZoomOut);
+    zoomOutAct->setStatusTip(tr("Zoom Out"));
+    connect(zoomOutAct, &QAction::triggered, this, &ComicReader::zoomOut);
+    viewMenu->addAction(zoomOutAct);
+    controlToolBar->addAction(zoomOutAct);
+
 }
 
-void ComicReader::showImage()
+void ComicReader::updateActions()
+{
+
+}
+
+void ComicReader::setImage()
 {
     currentPixmap.convertFromImage(*imageIterator);
-    int w = centerLabel->size().width();
-    int h = centerLabel->size().height();
-    centerLabel->setPixmap(currentPixmap.scaled(w, h, Qt::KeepAspectRatio)); // Load image to the label and resize it to the size of label
+    centerLabel->setPixmap(currentPixmap);
+}
+
+void ComicReader::zoomIn()
+{
+    scaleImage(1.25);
+}
+
+void ComicReader::zoomOut()
+{
+    scaleImage(0.8);
+}
+
+
+void ComicReader::scaleImage(double factor)
+{
+    Q_ASSERT(centerLabel->pixmap());
+
+    scaleFactor *= factor;
+    centerLabel->resize(scaleFactor * centerLabel->pixmap()->size());
+
+    adjustScrollBar(centerScrollArea->horizontalScrollBar(), factor);
+    adjustScrollBar(centerScrollArea->verticalScrollBar(), factor);
+    // Disable zooming if too large or too small
+    zoomInAct->setEnabled(scaleFactor < 3.0);
+    zoomOutAct->setEnabled(scaleFactor > 0.333);
+}
+
+void ComicReader::normalSize()
+{
+    centerLabel->adjustSize();
+    scaleFactor = 1.0;
+}
+
+void ComicReader::fitToWindow()
+{
+    //bool fitToWindow = fitToWindowAct->isChecked();
+    bool fitToWindow = true;
+    centerScrollArea->setWidgetResizable(fitToWindow);
+    if (!fitToWindow)
+        normalSize();
+    updateActions();
 }
 
 // Load image to imageVector
@@ -74,61 +140,11 @@ void ComicReader::loadImages()
     imageIterator = imageVector.begin();
 }
 
-// Set up the center widget layout. Default: show only center label, hide side label.
-void ComicReader::setUpCenterWidget()
-{
-    sideLabel->setGeometry(0, 0, 150, ui->centralWidget->height());
-    centerLabel->setGeometry(150, 0, ui->centralWidget->width() - 150, ui->centralWidget->height());
-    hideSideLabel();
-    isShowSideLabel = false;
-    createActions();
-    loadImages();
-    showImage();
-}
-
-// Resize side label and center label according to the situation.
-void ComicReader::resizeLabels()
-{
-    int w = ui->centralWidget->size().width();
-    int h = ui->centralWidget->size().height();
-    sideLabel->resize(150, h); // Alignment is wierd if we dont do this when hiding, dont know why.
-    if(isShowSideLabel)
-    {
-        centerLabel->resize(w - 150, h); // resize central label
-    }
-    else
-    {
-        centerLabel->resize(w, h); // resize central label
-    }
-}
-
 // Trigger show/hide center label and side label
 void ComicReader::triggerSideLabel()
 {
-    if(isShowSideLabel)
-    {
-        isShowSideLabel = false;
-        hideSideLabel();
-    }
-    else
-    {
-        isShowSideLabel = true;
-        showSideLabel();
-    }
-    resizeLabels();
-    showImage();
-}
-
-void ComicReader::showSideLabel()
-{
-    sideLabel->show();
-    centerLabel->move(sideLabel->geometry().topRight()); // Move left top coner of center label to right top conor of sidelabel
-}
-
-void ComicReader::hideSideLabel()
-{
-    sideLabel->hide();
-    centerLabel->move(0, 0); // Move left top coner of center label to left top coner of center widget
+    isShowSideLabel = !isShowSideLabel;
+    sideLabel->setVisible(isShowSideLabel);
 }
 
 void ComicReader::prevPage()
@@ -136,7 +152,7 @@ void ComicReader::prevPage()
     if(imageIterator != imageVector.begin())
     {
         imageIterator--;
-        showImage();
+        setImage();
     }
 }
 
@@ -145,8 +161,14 @@ void ComicReader::nextPage()
     if(imageIterator < imageVector.end()-1)
     {
         imageIterator++;
-        showImage();
+        setImage();
     }
+}
+
+void ComicReader::adjustScrollBar(QScrollBar *scrollBar, double factor)
+{
+    scrollBar->setValue(int(factor * scrollBar->value()
+                            + ((factor - 1) * scrollBar->pageStep()/2)));
 }
 
 // Free images in imageVector

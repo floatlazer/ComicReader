@@ -8,5 +8,7 @@
         <file>rightArrow.png</file>
         <file>leftArrow.png</file>
         <file>doubleArrow.png</file>
+        <file>zoomIn.png</file>
+        <file>zoomOut.png</file>
     </qresource>
 </RCC>
