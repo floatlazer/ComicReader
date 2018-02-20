@@ -12,19 +12,20 @@ ComicReader::ComicReader(QWidget *parent) :
     scaleFactor = 1.0;
     centerLabel->setScaledContents(true);
     centerScrollArea->setWidget(centerLabel);
-    centerLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+    centerLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored); // We can resize the label as we wish
 
     centerScrollArea->setWidgetResizable(false); // Scroll area will not resize the widget to fill itself
     createActions();
     sideLabel->setVisible(false);
-    loadImages();
-    setImage();
-    normalSize();
+    loadPages();
+    setPage();
+    //normalSize(); // Adjust label size to the normal size of the image
+    fitToWindow();
 }
 
 ComicReader::~ComicReader()
 {
-    freeImageVector();
+    freePageVector();
     delete ui;
 }
 
@@ -79,17 +80,45 @@ void ComicReader::createActions()
     viewMenu->addAction(zoomOutAct);
     controlToolBar->addAction(zoomOutAct);
 
+    normalSizeAct = viewMenu->addAction(tr("&Normal Size"), this, &ComicReader::normalSize);
+    normalSizeAct->setShortcut(tr("Ctrl+S"));
+    normalSizeAct->setCheckable(true);
+    viewMenu->addSeparator();
+
+    fitToWindowAct = viewMenu->addAction(tr("&Fit to Window"), this, &ComicReader::fitToWindow);
+    fitToWindowAct->setCheckable(true);
+    fitToWindowAct->setShortcut(tr("Ctrl+F"));
+
+    // Set default status
+    normalSizeAct->setEnabled(false);
+    normalSizeAct->setChecked(false);
+    zoomInAct->setEnabled(false);
+    zoomOutAct->setEnabled(false);
+    fitToWindowAct->setEnabled(false);
+    fitToWindowAct->setChecked(false);
 }
 
 void ComicReader::updateActions()
 {
-
+    zoomInAct->setEnabled(!fitToWindowAct->isChecked());
+    zoomOutAct->setEnabled(!fitToWindowAct->isChecked());
+    normalSizeAct->setEnabled(!fitToWindowAct->isChecked());
 }
 
-void ComicReader::setImage()
+void ComicReader::setPage()
 {
-    currentPixmap.convertFromImage(*imageIterator);
+    // Enable actions
+    zoomInAct->setEnabled(true);
+    zoomOutAct->setEnabled(true);
+    // Convert image
+    currentPixmap.convertFromImage(*(pageIterator->getImage()));
     centerLabel->setPixmap(currentPixmap);
+    // Scale image
+    /*if (normalSizeAct->isChecked())
+    {
+        scaleImage(1.0); // keep the old scaleFactor
+        //centerLabel->adjustSize();
+    }*/
 }
 
 void ComicReader::zoomIn()
@@ -105,8 +134,6 @@ void ComicReader::zoomOut()
 
 void ComicReader::scaleImage(double factor)
 {
-    Q_ASSERT(centerLabel->pixmap());
-
     scaleFactor *= factor;
     centerLabel->resize(scaleFactor * centerLabel->pixmap()->size());
 
@@ -119,28 +146,41 @@ void ComicReader::scaleImage(double factor)
 
 void ComicReader::normalSize()
 {
-    centerLabel->adjustSize();
+    //centerLabel->adjustSize();
     scaleFactor = 1.0;
+    scaleImage(1.0);
+    normalSizeAct->setEnabled(false);
+    normalSizeAct->setChecked(true);
+    fitToWindowAct->setEnabled(true);
+    fitToWindowAct->setChecked(false);
 }
 
 void ComicReader::fitToWindow()
 {
-    //bool fitToWindow = fitToWindowAct->isChecked();
-    bool fitToWindow = true;
-    centerScrollArea->setWidgetResizable(fitToWindow);
-    if (!fitToWindow)
-        normalSize();
-    updateActions();
+    bool fitToWindow = fitToWindowAct->isChecked();
+    double widthFactor = centerScrollArea->contentsRect().width() / centerLabel->pixmap()->width();
+    double heightFactor = centerScrollArea->contentsRect().height() / centerLabel->pixmap()->height();
+    double factor = widthFactor < heightFactor ? widthFactor : heightFactor; // Take a smaller one
+    scaleImage(factor);
+    normalSizeAct->setEnabled(true);
+    normalSizeAct->setChecked(false);
+    fitToWindowAct->setEnabled(false);
+    fitToWindowAct->setChecked(true);
 }
 
-// Load image to imageVector
-void ComicReader::loadImages()
+void ComicReader::resizeEvent(QResizeEvent *event)
 {
-    imageVector.append(*(new QImage(":/test/000.jpg")));
-    imageVector.append(*(new QImage(":/test/001.jpg")));
-    imageVector.append(*(new QImage(":/test/002.jpg")));
 
-    imageIterator = imageVector.begin();
+}
+
+// Load image and add to pageVector
+void ComicReader::loadPages()
+{
+    pageVector.append(*(new Page(new QImage(":/test/000.jpg"), 1)));
+    pageVector.append(*(new Page(new QImage(":/test/001.jpg"), 2)));
+    pageVector.append(*(new Page(new QImage(":/test/002.jpg"), 3)));
+
+    pageIterator = pageVector.begin();
 }
 
 // Trigger show/hide center label and side label
@@ -152,19 +192,19 @@ void ComicReader::triggerSideLabel()
 
 void ComicReader::prevPage()
 {
-    if(imageIterator != imageVector.begin())
+    if(pageIterator != pageVector.begin())
     {
-        imageIterator--;
-        setImage();
+        pageIterator--;
+        setPage();
     }
 }
 
 void ComicReader::nextPage()
 {
-    if(imageIterator < imageVector.end()-1)
+    if(pageIterator < pageVector.end()-1)
     {
-        imageIterator++;
-        setImage();
+        pageIterator++;
+        setPage();
     }
 }
 
@@ -175,11 +215,11 @@ void ComicReader::adjustScrollBar(QScrollBar *scrollBar, double factor)
 }
 
 // Free images in imageVector
-void ComicReader::freeImageVector()
+void ComicReader::freePageVector()
 {
-    for(QVector<QImage>::Iterator it = imageVector.begin(); it != imageVector.end(); it++)
+    for(QVector<Page>::Iterator it = pageVector.begin(); it != pageVector.end(); it++)
     {
-        it->~QImage();
+        it->getImage()->~QImage();
     }
 }
 

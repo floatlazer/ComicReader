@@ -6,6 +6,7 @@
 #include <QLabel>
 #include <QScrollBar>
 #include <QScrollArea>
+#include "page.h"
 
 namespace Ui {
 class ComicReader;
@@ -25,13 +26,13 @@ private:
     void createActions();
     void updateActions();
     // Images
-    void loadImages();
-    void setImage();
+    void loadPages();
+    void setPage();
     void zoomIn();
     void zoomOut();
     void scaleImage(double factor);
     void adjustScrollBar(QScrollBar *scrollBar, double factor);
-    void freeImageVector();
+    void freePageVector();
     // Control
     void prevPage();
     void nextPage();
@@ -39,8 +40,8 @@ private:
     void normalSize();
     void fitToWindow();
 
-    QVector<QImage> imageVector; // The vector of loaded images
-    QVector<QImage>::Iterator imageIterator;
+    QVector<Page> pageVector; // The vector of loaded pages
+    QVector<Page>::Iterator pageIterator;
     QPixmap currentPixmap;
     QLabel* centerLabel;
     double scaleFactor;
@@ -53,6 +54,10 @@ private:
     QAction* zoomInAct;
     QAction* zoomOutAct;
     QAction* triggerAct;
+    QAction* normalSizeAct;
+    QAction* fitToWindowAct;
+protected:
+    virtual void resizeEvent(QResizeEvent *event);
 };
 
 #endif // COMICREADER_H
