@@ -26,7 +26,7 @@
       <property name="minimumSize">
        <size>
         <width>150</width>
-        <height>0</height>
+        <height>150</height>
        </size>
       </property>
       <property name="text">
@@ -37,10 +37,16 @@
     <item>
      <widget class="QScrollArea" name="centerScrollArea">
       <property name="sizePolicy">
-       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
         <horstretch>0</horstretch>
         <verstretch>0</verstretch>
        </sizepolicy>
+      </property>
+      <property name="verticalScrollBarPolicy">
+       <enum>Qt::ScrollBarAsNeeded</enum>
+      </property>
+      <property name="horizontalScrollBarPolicy">
+       <enum>Qt::ScrollBarAsNeeded</enum>
       </property>
       <property name="widgetResizable">
        <bool>true</bool>
@@ -60,31 +66,6 @@
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
-       <widget class="QLabel" name="centerLabel">
-        <property name="geometry">
-         <rect>
-          <x>12</x>
-          <y>12</y>
-          <width>72</width>
-          <height>16</height>
-         </rect>
-        </property>
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Ignored" vsizetype="Ignored">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="text">
-         <string>center label</string>
-        </property>
-        <property name="scaledContents">
-         <bool>false</bool>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignCenter</set>
-        </property>
-       </widget>
       </widget>
      </widget>
     </item>

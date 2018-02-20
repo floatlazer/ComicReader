@@ -3,15 +3,18 @@
 
 ComicReader::ComicReader(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::ComicReader)
+    ui(new Ui::ComicReader),
+    centerLabel(new QLabel)
 {
     ui->setupUi(this);
-    centerLabel = ui->centerLabel;
     centerScrollArea = ui->centerScrollArea;
     sideLabel = ui->sideLabel;
     scaleFactor = 1.0;
-    centerLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
     centerLabel->setScaledContents(true);
+    centerScrollArea->setWidget(centerLabel);
+    centerLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+
+    centerScrollArea->setWidgetResizable(false); // Scroll area will not resize the widget to fill itself
     createActions();
     sideLabel->setVisible(false);
     loadImages();
