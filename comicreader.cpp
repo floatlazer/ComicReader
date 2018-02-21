@@ -1,26 +1,25 @@
 #include "comicreader.h"
 #include "ui_comicreader.h"
-
+#include <QScreen>
+#include <QDebug>
 ComicReader::ComicReader(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::ComicReader),
-    centerLabel(new QLabel)
+    ui(new Ui::ComicReader)
 {
     ui->setupUi(this);
+    centerLabel = ui->centerLabel;
+    scaleFactor = 1.0;
+    zoomCount = 0;
     centerScrollArea = ui->centerScrollArea;
     sideLabel = ui->sideLabel;
-    scaleFactor = 1.0;
-    centerLabel->setScaledContents(true);
-    centerScrollArea->setWidget(centerLabel);
-    centerLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored); // We can resize the label as we wish
-
-    centerScrollArea->setWidgetResizable(false); // Scroll area will not resize the widget to fill itself
-    createActions();
+    centerLabel->setScaledContents(false);
     sideLabel->setVisible(false);
+    createActions();
     loadPages();
+    fitToWindowAct->setChecked(true);
+    normalSizeAct->setEnabled(true);
     setPage();
-    //normalSize(); // Adjust label size to the normal size of the image
-    fitToWindow();
+    adjustSize();
 }
 
 ComicReader::~ComicReader()
@@ -98,45 +97,60 @@ void ComicReader::createActions()
     fitToWindowAct->setChecked(false);
 }
 
+// Note that use check will take effect after actions
 void ComicReader::updateActions()
 {
-    zoomInAct->setEnabled(!fitToWindowAct->isChecked());
-    zoomOutAct->setEnabled(!fitToWindowAct->isChecked());
-    normalSizeAct->setEnabled(!fitToWindowAct->isChecked());
+    if(normalSizeAct->isEnabled())
+    {
+        normalSizeAct->setEnabled(false);
+        fitToWindowAct->setEnabled(true);
+        fitToWindowAct->setChecked(false);
+    }
+    else
+    {
+        fitToWindowAct->setEnabled(false);
+        normalSizeAct->setEnabled(false);
+        normalSizeAct->setChecked(false);
+    }
 }
 
 void ComicReader::setPage()
 {
+    qDebug()<<"setPage"<<"FitToWindow"<<fitToWindowAct->isChecked();
     // Enable actions
     zoomInAct->setEnabled(true);
     zoomOutAct->setEnabled(true);
     // Convert image
     currentPixmap.convertFromImage(*(pageIterator->getImage()));
-    centerLabel->setPixmap(currentPixmap);
-    // Scale image
-    /*if (normalSizeAct->isChecked())
+    scaleImage(1.0); // Keep scaleFactor
+    if(!fitToWindowAct->isChecked() && zoomCount == 0) // fitToWindow and not zoomed, keep fit to window
     {
-        scaleImage(1.0); // keep the old scaleFactor
-        //centerLabel->adjustSize();
-    }*/
+        scaleImageToWindow();
+    }
 }
 
 void ComicReader::zoomIn()
 {
-    scaleImage(1.25);
+    double factor = 1.25;
+    scaleImage(factor);
+    zoomCount++;
 }
 
 void ComicReader::zoomOut()
 {
-    scaleImage(0.8);
+    double factor = 0.8;
+    scaleImage(factor);
+    zoomCount--;
 }
 
 
 void ComicReader::scaleImage(double factor)
 {
     scaleFactor *= factor;
-    centerLabel->resize(scaleFactor * centerLabel->pixmap()->size());
-
+    qDebug()<<"scaleImage"<<scaleFactor;
+    centerLabel->setPixmap(currentPixmap.scaled(currentPixmap.size()*scaleFactor, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    centerLabel->adjustSize();
+    ui->scrollAreaWidgetContents->adjustSize();
     adjustScrollBar(centerScrollArea->horizontalScrollBar(), factor);
     adjustScrollBar(centerScrollArea->verticalScrollBar(), factor);
     // Disable zooming if too large or too small
@@ -146,39 +160,54 @@ void ComicReader::scaleImage(double factor)
 
 void ComicReader::normalSize()
 {
+    qDebug()<<"normalSize";
     //centerLabel->adjustSize();
-    scaleFactor = 1.0;
-    scaleImage(1.0);
-    normalSizeAct->setEnabled(false);
-    normalSizeAct->setChecked(true);
-    fitToWindowAct->setEnabled(true);
-    fitToWindowAct->setChecked(false);
+    //scaleImage(1.0);
+    updateActions();
 }
 
 void ComicReader::fitToWindow()
 {
-    bool fitToWindow = fitToWindowAct->isChecked();
-    double widthFactor = centerScrollArea->contentsRect().width() / centerLabel->pixmap()->width();
-    double heightFactor = centerScrollArea->contentsRect().height() / centerLabel->pixmap()->height();
-    double factor = widthFactor < heightFactor ? widthFactor : heightFactor; // Take a smaller one
-    scaleImage(factor);
-    normalSizeAct->setEnabled(true);
-    normalSizeAct->setChecked(false);
-    fitToWindowAct->setEnabled(false);
-    fitToWindowAct->setChecked(true);
+    qDebug()<<"fitToWindow";
+    scaleImageToWindow();
+    zoomCount = 0;
+    updateActions();
 }
 
+void ComicReader::scaleImageToWindow()
+{
+    centerLabel->setPixmap(currentPixmap.scaled(ui->centralWidget->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    centerLabel->adjustSize();
+    ui->scrollAreaWidgetContents->adjustSize();
+    // Update scaleFactor
+    double factorWidth = double(centerLabel->pixmap()->width())/double(currentPixmap.width());
+    double factorHeight = double(centerLabel->pixmap()->height())/double(currentPixmap.height());
+    scaleFactor = factorWidth < factorHeight ? factorWidth : factorHeight;
+    qDebug()<<"scaleImageToWindow"<<scaleFactor;
+
+}
+
+// Resize image when resize the window
 void ComicReader::resizeEvent(QResizeEvent *event)
 {
+    if(fitToWindowAct->isChecked() && zoomCount == 0)
+    {
+        qDebug()<<"resizeEvent"<<"mainWindow"<<size();
+        scaleImageToWindow();
+    }
+}
 
+QSize ComicReader::sizeHint() const
+{
+    return centerLabel->sizeHint()+QSize(0, ui->mainToolBar->height()+ui->statusBar->height()+11); // Dont know why add 11
 }
 
 // Load image and add to pageVector
 void ComicReader::loadPages()
 {
-    pageVector.append(*(new Page(new QImage(":/test/000.jpg"), 1)));
-    pageVector.append(*(new Page(new QImage(":/test/001.jpg"), 2)));
+    pageVector.append(*(new Page(new QImage(":/test/000.jpg"), 2)));
     pageVector.append(*(new Page(new QImage(":/test/002.jpg"), 3)));
+    pageVector.append(*(new Page(new QImage(":/test/001.jpg"), 1)));
 
     pageIterator = pageVector.begin();
 }
@@ -210,8 +239,7 @@ void ComicReader::nextPage()
 
 void ComicReader::adjustScrollBar(QScrollBar *scrollBar, double factor)
 {
-    scrollBar->setValue(int(factor * scrollBar->value()
-                            + ((factor - 1) * scrollBar->pageStep()/2)));
+    scrollBar->setValue(int(factor * scrollBar->value() + ((factor - 1) * scrollBar->pageStep()/2)));
 }
 
 // Free images in imageVector

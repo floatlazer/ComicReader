@@ -9,24 +9,14 @@ public:
     Page(QImage* _image, unsigned int number);
     // Getter
     QImage* getImage();
-    int getHorizontalScrollBarValue();
-    int getVerticalScrollBarValue();
-    int isZoomed();
     unsigned int getPageNumber();
-    double getZoomFactor();
+    int getMode();
     // Setter
     void setImage(QImage* _image);
-    void setZoomOut();
-    void setZoomIn();
-    void setZoomFactor(double factor);
     void setPageNumber(unsigned int number);
 private:
     QImage* image;
     unsigned int pageNumber;
-    double zoomFactor;
-    int zoomCount; // Zoom in +1, zoom out -1
-    int horizontalScrollBarValue;
-    int verticalScrollBarValue;
     void initParams();
 };
 

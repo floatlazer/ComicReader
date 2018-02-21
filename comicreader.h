@@ -39,15 +39,17 @@ private:
     void triggerSideLabel();
     void normalSize();
     void fitToWindow();
+    void scaleImageToWindow();
 
     QVector<Page> pageVector; // The vector of loaded pages
     QVector<Page>::Iterator pageIterator;
     QPixmap currentPixmap;
     QLabel* centerLabel;
-    double scaleFactor;
     QScrollArea* centerScrollArea;
     QLabel* sideLabel;
     bool isShowSideLabel;
+    double scaleFactor;
+    int zoomCount; // 0 if not zoomed
     // QAction
     QAction* prevAct;
     QAction* nextAct;
@@ -56,8 +58,10 @@ private:
     QAction* triggerAct;
     QAction* normalSizeAct;
     QAction* fitToWindowAct;
+
 protected:
     virtual void resizeEvent(QResizeEvent *event);
+    virtual QSize sizeHint() const;
 };
 
 #endif // COMICREADER_H
