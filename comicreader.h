@@ -40,6 +40,7 @@ private:
     void normalSize();
     void fitToWindow();
     void scaleImageToWindow();
+    bool isFirstPage;
 
     QVector<Page> pageVector; // The vector of loaded pages
     QVector<Page>::Iterator pageIterator;

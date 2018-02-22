@@ -10,6 +10,7 @@ ComicReader::ComicReader(QWidget *parent) :
     centerLabel = ui->centerLabel;
     scaleFactor = 1.0;
     zoomCount = 0;
+    isFirstPage = true;
     centerScrollArea = ui->centerScrollArea;
     sideLabel = ui->sideLabel;
     centerLabel->setScaledContents(false);
@@ -19,6 +20,7 @@ ComicReader::ComicReader(QWidget *parent) :
     fitToWindowAct->setChecked(true);
     normalSizeAct->setEnabled(true);
     setPage();
+    isFirstPage = false;
     adjustSize();
 }
 
@@ -123,7 +125,7 @@ void ComicReader::setPage()
     // Convert image
     currentPixmap.convertFromImage(*(pageIterator->getImage()));
     scaleImage(1.0); // Keep scaleFactor
-    if(!fitToWindowAct->isChecked() && zoomCount == 0) // fitToWindow and not zoomed, keep fit to window
+    if(fitToWindowAct->isChecked() && zoomCount == 0 && ! isFirstPage) // fitToWindow and not zoomed, keep fit to window
     {
         scaleImageToWindow();
     }
