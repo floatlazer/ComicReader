@@ -2,6 +2,9 @@
 #include "ui_comicreader.h"
 #include <QScreen>
 #include <QDebug>
+#include <QFileDialog>
+#include <QStandardPaths>
+
 ComicReader::ComicReader(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::ComicReader)
@@ -36,6 +39,12 @@ void ComicReader::createActions()
     QMenu * controlMenu = menuBar()->addMenu(tr("&Control"));
     QMenu * viewMenu = menuBar()->addMenu(tr("&View"));
     QToolBar *controlToolBar = addToolBar(tr("Control"));
+
+    // Open action
+    openAct = new QAction (tr("&Open"), this);
+    openAct->setStatusTip(tr("Open"));
+    connect(openAct, &QAction::triggered, this, &ComicReader::open);
+    controlMenu->addAction(openAct);
 
     // Trigger hide/show sideLabel action
     const QIcon triggerIcon = QIcon::fromTheme("document-new", QIcon(":/icon/doubleArrow.png"));
@@ -219,6 +228,16 @@ void ComicReader::triggerSideLabel()
 {
     isShowSideLabel = !isShowSideLabel;
     sideLabel->setVisible(isShowSideLabel);
+}
+
+void ComicReader::open()
+{
+    // Select a png, jpg, cbr or cbz
+    qDebug()<<"open"<<QStandardPaths::writableLocation(QStandardPaths::HomeLocation);
+    fileName = QFileDialog::getOpenFileName(this, tr("Open Image"),
+               QStandardPaths::writableLocation(QStandardPaths::HomeLocation),
+               tr("Image Files (*.png *.jpg *.cbr *.cbz)"));
+    qDebug()<<"Filename"<<fileName;
 }
 
 void ComicReader::prevPage()
