@@ -34,6 +34,7 @@ private:
     void adjustScrollBar(QScrollBar *scrollBar, double factor);
     void freePageVector();
     // Control
+    void open();
     void prevPage();
     void nextPage();
     void triggerSideLabel();
@@ -52,6 +53,7 @@ private:
     double scaleFactor;
     int zoomCount; // 0 if not zoomed
     // QAction
+    QAction* openAct;
     QAction* prevAct;
     QAction* nextAct;
     QAction* zoomInAct;
@@ -59,6 +61,7 @@ private:
     QAction* triggerAct;
     QAction* normalSizeAct;
     QAction* fitToWindowAct;
+    QString fileName;
 
 protected:
     virtual void resizeEvent(QResizeEvent *event);
