@@ -2,6 +2,7 @@
 #define DECOMPRESS_H
 
 #include <QString>
+#include "unarr.h"
 
 //class decompress the archieve file
 
@@ -12,12 +13,12 @@ public:
     Decompress();
     ~Decompress();
 
-    //decompress the archive file
-    void DecFiles(QString Path);
+    //Open archive file and decompress
+    void DecFiles(const char *Path);
 
-    //get file
-    void GetFiles(ar_archive *listing,char *filename);
-    char *filename;
+    //get file from decompress archive
+    bool GetFiles(ar_archive *listing, const char *filename);
+    const char *filename;
 
 private:
     ar_archive *listing;
