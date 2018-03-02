@@ -26,14 +26,29 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         main.cpp \
         comicreader.cpp \
-    page.cpp
+    page.cpp \
+    decompress.cpp
 
 HEADERS += \
         comicreader.h \
-    page.h
+    page.h \
+    decompress.h
 
 FORMS += \
         comicreader.ui
 
 RESOURCES += \
     res.qrc
+
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/./release/ -lunarr
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/./debug/ -lunarr
+else:unix: LIBS += -L$$PWD/./ -lunarr
+
+INCLUDEPATH += $$PWD/.
+DEPENDPATH += $$PWD/.
+
+win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/./release/libunarr.a
+else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/./debug/libunarr.a
+else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/./release/unarr.lib
+else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/./debug/unarr.lib
+else:unix: PRE_TARGETDEPS += $$PWD/./libunarr.a

@@ -16,7 +16,7 @@ ComicReader::ComicReader(QWidget *parent) :
     isFirstPage = true;
     centerScrollArea = ui->centerScrollArea;
     sideLabel = ui->sideLabel;
-    centerLabel->setScaledContents(false);
+    centerLabel->setScaledContents(true);
     sideLabel->setVisible(false);
     createActions();
     loadPages();
@@ -213,6 +213,7 @@ QSize ComicReader::sizeHint() const
     return centerLabel->sizeHint()+QSize(0, ui->mainToolBar->height()+ui->statusBar->height()+11); // Dont know why add 11
 }
 
+
 // Load image and add to pageVector
 void ComicReader::loadPages()
 {
@@ -222,6 +223,7 @@ void ComicReader::loadPages()
 
     pageIterator = pageVector.begin();
 }
+
 
 // Trigger show/hide center label and side label
 void ComicReader::triggerSideLabel()
