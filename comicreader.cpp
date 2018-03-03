@@ -247,7 +247,7 @@ void ComicReader::resizeEvent(QResizeEvent *event)
 
 QSize ComicReader::sizeHint() const
 {
-    return centerLabel->sizeHint()+QSize(0, ui->mainToolBar->height()+ui->statusBar->height()+11); // Dont know why add 11
+    return centerLabel->sizeHint()+QSize(0, ui->mainToolBar->height()+ui->statusBar->height() + ui->menuBar->height());
 }
 
 // Load image and add to pageVector
