@@ -4,6 +4,7 @@
 #include <QDebug>
 #include <QFileDialog>
 #include <QStandardPaths>
+#include <QPainter>
 
 ComicReader::ComicReader(QWidget *parent) :
     QMainWindow(parent),
@@ -22,6 +23,7 @@ ComicReader::ComicReader(QWidget *parent) :
     loadPages();
     fitToWindowAct->setChecked(true);
     normalSizeAct->setEnabled(true);
+    doublePageAct->setEnabled(true);
     setPage();
     isFirstPage = false;
     adjustSize();
@@ -90,14 +92,21 @@ void ComicReader::createActions()
     viewMenu->addAction(zoomOutAct);
     controlToolBar->addAction(zoomOutAct);
 
+    // NormalSize action
     normalSizeAct = viewMenu->addAction(tr("&Normal Size"), this, &ComicReader::normalSize);
     normalSizeAct->setShortcut(tr("Ctrl+S"));
     normalSizeAct->setCheckable(true);
     viewMenu->addSeparator();
 
+    // FitToWindow action
     fitToWindowAct = viewMenu->addAction(tr("&Fit to Window"), this, &ComicReader::fitToWindow);
     fitToWindowAct->setCheckable(true);
     fitToWindowAct->setShortcut(tr("Ctrl+F"));
+
+    // DoublePageMode action
+    doublePageAct = viewMenu->addAction(tr("&Double page mode"), this, &ComicReader::triggerDoublePage);
+    doublePageAct->setCheckable(true);
+    doublePageAct->setShortcut(tr("Ctrl+D"));
 
     // Set default status
     normalSizeAct->setEnabled(false);
@@ -106,6 +115,8 @@ void ComicReader::createActions()
     zoomOutAct->setEnabled(false);
     fitToWindowAct->setEnabled(false);
     fitToWindowAct->setChecked(false);
+    doublePageAct->setEnabled(false);
+    doublePageAct->setChecked(false);
 }
 
 // Note that use check will take effect after actions
@@ -127,16 +138,36 @@ void ComicReader::updateActions()
 
 void ComicReader::setPage()
 {
-    qDebug()<<"setPage"<<"FitToWindow"<<fitToWindowAct->isChecked();
+    qDebug()<<"setPage"<<"FitToWindow"<<fitToWindowAct->isChecked()<<"DoublePageMode"<<doublePageAct->isChecked();
     // Enable actions
     zoomInAct->setEnabled(true);
     zoomOutAct->setEnabled(true);
-    // Convert image
-    currentPixmap.convertFromImage(*(pageIterator->getImage()));
-    scaleImage(1.0); // Keep scaleFactor
+    // Set pixmap
+    if(!doublePageAct->isChecked() || pageIterator == pageVector.end()-1)     // Single page mode
+        currentPixmap.convertFromImage(pageIterator->getImage());
+    else{                  // Double pages mode
+        int pageMargin = 30;
+        int WIDTH = pageIterator->getImage().width() + (pageIterator + 1)->getImage().width() + pageMargin;
+        int HEIGHT = qMax(pageIterator->getImage().height(), (pageIterator + 1)->getImage().height());
+        QPixmap *pixmap=new QPixmap(WIDTH, HEIGHT);
+        pixmap->fill(Qt::transparent);
+        currentPixmap = *pixmap;
+        // Paint two pix map on one pixmap
+        QPainter *painter=new QPainter(&currentPixmap); // New painter
+        painter->drawPixmap(0, (HEIGHT - pageIterator->getImage().height()) / 2, pageIterator->getImage().width(),
+                            pageIterator->getImage().height(), QPixmap::fromImage(pageIterator->getImage()));
+        painter->drawPixmap(pageIterator->getImage().width()+pageMargin, (HEIGHT - (pageIterator+1)->getImage().height()) / 2, (pageIterator+1)->getImage().width(),
+                            (pageIterator+1)->getImage().height(), QPixmap::fromImage((pageIterator+1)->getImage()));
+        painter->~QPainter(); // destroy painter
+    }
+
     if(fitToWindowAct->isChecked() && zoomCount == 0 && ! isFirstPage) // fitToWindow and not zoomed, keep fit to window
     {
         scaleImageToWindow();
+    }
+    else
+    {
+        scaleImage(1.0); // Keep scaleFactor
     }
 }
 
@@ -154,7 +185,7 @@ void ComicReader::zoomOut()
     zoomCount--;
 }
 
-// Scale image, multiply the current scaleFactor by factor. Every image scaling function should use thise method.
+// Scale image, multiply the current scaleFactor by factor. Every image scaling function should use this method.
 void ComicReader::scaleImage(double factor)
 {
     scaleFactor *= factor;
@@ -185,6 +216,12 @@ void ComicReader::fitToWindow()
     updateActions();
 }
 
+void ComicReader::triggerDoublePage()
+{
+    qDebug()<<"triggerDoublePage";
+    setPage();
+}
+
 void ComicReader::scaleImageToWindow()
 {
     centerLabel->setPixmap(currentPixmap.scaled(ui->centralWidget->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
@@ -210,16 +247,16 @@ void ComicReader::resizeEvent(QResizeEvent *event)
 
 QSize ComicReader::sizeHint() const
 {
-    return centerLabel->sizeHint()+QSize(0, ui->mainToolBar->height()+ui->statusBar->height()+11); // Dont know why add 11
+    return centerLabel->sizeHint()+QSize(0, ui->mainToolBar->height()+ui->statusBar->height() + ui->menuBar->height());
 }
 
 
 // Load image and add to pageVector
 void ComicReader::loadPages()
 {
-    pageVector.append(*(new Page(new QImage(":/test/000.jpg"), 2)));
-    pageVector.append(*(new Page(new QImage(":/test/002.jpg"), 3)));
-    pageVector.append(*(new Page(new QImage(":/test/001.jpg"), 1)));
+    pageVector.append(*(new Page(*(new QImage(":/test/000.jpg")), 2)));
+    pageVector.append(*(new Page(*(new QImage(":/test/002.jpg")), 3)));
+    pageVector.append(*(new Page(*(new QImage(":/test/001.jpg")), 1)));
 
     pageIterator = pageVector.begin();
 }
@@ -278,7 +315,7 @@ void ComicReader::freePageVector()
 {
     for(QVector<Page>::Iterator it = pageVector.begin(); it != pageVector.end(); it++)
     {
-        it->getImage()->~QImage();
+        it->getImage().~QImage();
     }
 }
 

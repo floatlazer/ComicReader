@@ -40,6 +40,7 @@ private:
     void triggerSideLabel();
     void normalSize();
     void fitToWindow();
+    void triggerDoublePage();
     void scaleImageToWindow();
     bool isFirstPage;
 
@@ -61,6 +62,7 @@ private:
     QAction* triggerAct;
     QAction* normalSizeAct;
     QAction* fitToWindowAct;
+    QAction* doublePageAct;
     QString fileName;
 
 protected:
