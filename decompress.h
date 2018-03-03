@@ -2,11 +2,13 @@
 #define DECOMPRESS_H
 
 #include <QString>
+extern "C"
+{
 #include "unarr.h"
+}
+
 
 //class decompress the archieve file
-
-
 class Decompress
 {
 public:

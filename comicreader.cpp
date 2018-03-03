@@ -224,7 +224,15 @@ void ComicReader::loadPages()
     pageIterator = pageVector.begin();
 }
 
-
+/*
+void ComicReader::loadPages()
+{
+    Decompress decom;
+    decom.DecFiles(":/compress.tar");
+    decom.GetFiles();
+    pageVector.append(*(new Page(new QImage(decom.filename),1)));
+}
+*/
 // Trigger show/hide center label and side label
 void ComicReader::triggerSideLabel()
 {
