@@ -147,17 +147,15 @@ void ComicReader::setPage()
         currentPixmap.convertFromImage(pageIterator->getImage());
     else{                  // Double pages mode
         int pageMargin = 30;
-        int WIDTH = pageIterator->getImage().width() + (pageIterator + 1)->getImage().width() + pageMargin;
+        int WIDTH = qMax(pageIterator->getImage().width(), (pageIterator + 1)->getImage().width());
         int HEIGHT = qMax(pageIterator->getImage().height(), (pageIterator + 1)->getImage().height());
-        QPixmap *pixmap=new QPixmap(WIDTH, HEIGHT);
+        QPixmap *pixmap=new QPixmap(WIDTH * 2 + pageMargin, HEIGHT);
         pixmap->fill(Qt::transparent);
         currentPixmap = *pixmap;
         // Paint two pix map on one pixmap
         QPainter *painter=new QPainter(&currentPixmap); // New painter
-        painter->drawPixmap(0, (HEIGHT - pageIterator->getImage().height()) / 2, pageIterator->getImage().width(),
-                            pageIterator->getImage().height(), QPixmap::fromImage(pageIterator->getImage()));
-        painter->drawPixmap(pageIterator->getImage().width()+pageMargin, (HEIGHT - (pageIterator+1)->getImage().height()) / 2, (pageIterator+1)->getImage().width(),
-                            (pageIterator+1)->getImage().height(), QPixmap::fromImage((pageIterator+1)->getImage()));
+        painter->drawPixmap(0, 0, WIDTH, HEIGHT, QPixmap::fromImage(pageIterator->getImage()));
+        painter->drawPixmap(WIDTH + pageMargin, 0, WIDTH, HEIGHT, QPixmap::fromImage((pageIterator+1)->getImage()));
         painter->~QPainter(); // destroy painter
     }
 
