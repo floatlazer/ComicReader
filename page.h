@@ -1,6 +1,8 @@
 #ifndef PAGE_H
 #define PAGE_H
 #include<QImage>
+#include <QPixmap>
+
 // Class contains image and information of a page in a comic book
 class Page
 {

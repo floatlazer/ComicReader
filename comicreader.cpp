@@ -20,16 +20,17 @@ ComicReader::ComicReader(QWidget *parent) :
     sideLabel->setVisible(false);
     createActions();
     loadPages();
-    fitToWindowAct->setChecked(true);
-    normalSizeAct->setEnabled(true);
-    setPage();
-    isFirstPage = false;
-    adjustSize();
+   // fitToWindowAct->setChecked(true);
+    //normalSizeAct->setEnabled(true);
+    //setPage();
+    //isFirstPage = false;
+    //adjustSize();
 }
 
 ComicReader::~ComicReader()
 {
-    freePageVector();
+    //freePageVector();
+    pageVector.clear();
     delete ui;
 }
 
@@ -217,22 +218,19 @@ QSize ComicReader::sizeHint() const
 // Load image and add to pageVector
 void ComicReader::loadPages()
 {
-    pageVector.append(*(new Page(new QImage(":/test/000.jpg"), 2)));
-    pageVector.append(*(new Page(new QImage(":/test/002.jpg"), 3)));
-    pageVector.append(*(new Page(new QImage(":/test/001.jpg"), 1)));
-
+    //Decompress decom;
+    decom.DecFiles("/Users/LIZhufeng/Documents/in204_cbr/compress.tar");
+    decom.GetFiles(); //buffer in this
+    QImage XUAN;
+    XUAN.loadFromData(decom.buffer,decom.taille,"JPG");
+    centerLabel->setPixmap(QPixmap::fromImage(XUAN));
+    qDebug()<<decom.taille;
+    //pageVector.append(*(new Page(new QImage(":/test/001.jpg"), 1)));
+    pageVector.append(*(new Page(&XUAN,1)));
     pageIterator = pageVector.begin();
+    //pageIterator->setImage(&XUAN);
 }
 
-/*
-void ComicReader::loadPages()
-{
-    Decompress decom;
-    decom.DecFiles(":/compress.tar");
-    decom.GetFiles();
-    pageVector.append(*(new Page(new QImage(decom.filename),1)));
-}
-*/
 // Trigger show/hide center label and side label
 void ComicReader::triggerSideLabel()
 {
