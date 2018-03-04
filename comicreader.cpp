@@ -31,7 +31,7 @@ ComicReader::ComicReader(QWidget *parent) :
 
 ComicReader::~ComicReader()
 {
-    freePageVector();
+    pageVector.clear();
     delete ui;
 }
 
@@ -252,9 +252,26 @@ QSize ComicReader::sizeHint() const
 // Load image and add to pageVector
 void ComicReader::loadPages()
 {
-    pageVector.append(*(new Page(*(new QImage(":/test/000.jpg")), 2)));
+    QString path1 = "/Users/zhangxuan/Desktop/comicExample_big";
+    QString path2 = "/Users/zhangxuan/Desktop/comicExample_normal";
+
+    for(int i = 1; i<=52; i++)
+    {
+        pageVector.append(*(new Page(i)));
+    }
+    int n = 1;
+    for(auto i = pageVector.begin(); i<pageVector.end(); i++)
+    {
+        QString number = QString("%1").arg(n, 3, 10, QChar('0'));
+        QString p = path1 + "/"+ number+".png";
+        i->setImage(*(new QImage(p)));
+        qDebug()<<p;
+        n++;
+    }
+
+    /*pageVector.append(*(new Page(*(new QImage(":/test/000.jpg")), 2)));
     pageVector.append(*(new Page(*(new QImage(":/test/002.jpg")), 3)));
-    pageVector.append(*(new Page(*(new QImage(":/test/001.jpg")), 1)));
+    pageVector.append(*(new Page(*(new QImage(":/test/001.jpg")), 1)));*/
 
     pageIterator = pageVector.begin();
 }
@@ -308,12 +325,4 @@ void ComicReader::adjustScrollBar(QScrollBar *scrollBar, double factor)
     scrollBar->setValue(int(factor * scrollBar->value() + ((factor - 1) * scrollBar->pageStep()/2)));
 }
 
-// Free images in imageVector
-void ComicReader::freePageVector()
-{
-    for(QVector<Page>::Iterator it = pageVector.begin(); it != pageVector.end(); it++)
-    {
-        it->getImage().~QImage();
-    }
-}
 

@@ -1,5 +1,5 @@
 #include "page.h"
-
+#include <QDebug>
 Page::Page()
 {
     initParams();
@@ -10,6 +10,18 @@ Page::Page(QImage _image, unsigned int number)
     initParams();
     image = _image; // QImage is implicite shared
     pageNumber = number;
+}
+
+Page::Page(unsigned int number)
+{
+    initParams();
+    pageNumber = number;
+}
+
+Page::~Page()
+{
+    qDebug()<<"Destroy page"<<pageNumber;
+    //image.~QImage(); QImage is implicitly shared
 }
 
 void Page::initParams()
