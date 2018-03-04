@@ -8,6 +8,8 @@ class Page
 public:
     Page();
     Page(QImage _image, unsigned int number);
+    Page(unsigned int number);
+    ~Page();
     // Getter
     QImage getImage();
     unsigned int getPageNumber();
