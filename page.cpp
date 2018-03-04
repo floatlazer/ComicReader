@@ -5,10 +5,10 @@ Page::Page()
     initParams();
 }
 
-Page::Page(QImage* _image, unsigned int number)
+Page::Page(QImage _image, unsigned int number)
 {
     initParams();
-    image = _image;
+    image = _image; // QImage is implicite shared
     pageNumber = number;
 }
 
@@ -19,12 +19,12 @@ void Page::initParams()
 
 // Getter
 
-QImage* Page::getImage(){ return image;}
+QImage Page::getImage(){ return image;}
 
 unsigned int Page::getPageNumber(){return pageNumber;}
 
 // Setter
 
-void Page::setImage(QImage* _image){image = _image;}
+void Page::setImage(QImage _image){image = _image;}
 
 void Page::setPageNumber(unsigned int number){pageNumber = number;}
