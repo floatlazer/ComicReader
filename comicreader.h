@@ -6,6 +6,7 @@
 #include <QLabel>
 #include <QScrollBar>
 #include <QScrollArea>
+#include <QMouseEvent>
 #include "page.h"
 
 namespace Ui {
@@ -68,6 +69,7 @@ private:
 protected:
     virtual void resizeEvent(QResizeEvent *event);
     virtual QSize sizeHint() const;
+    virtual void mouseMoveEvent(QMouseEvent *event);
 };
 
 #endif // COMICREADER_H

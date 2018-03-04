@@ -19,6 +19,7 @@ ComicReader::ComicReader(QWidget *parent) :
     sideLabel = ui->sideLabel;
     centerLabel->setScaledContents(false);
     sideLabel->setVisible(false);
+    setMouseTracking(true);
     createActions();
     loadPages();
     fitToWindowAct->setChecked(true);
@@ -27,6 +28,7 @@ ComicReader::ComicReader(QWidget *parent) :
     setPage();
     isFirstPage = false;
     adjustSize();
+
 }
 
 ComicReader::~ComicReader()
@@ -147,15 +149,16 @@ void ComicReader::setPage()
         currentPixmap.convertFromImage(pageIterator->getImage());
     else{                  // Double pages mode
         int pageMargin = 30;
-        int WIDTH = qMax(pageIterator->getImage().width(), (pageIterator + 1)->getImage().width());
         int HEIGHT = qMax(pageIterator->getImage().height(), (pageIterator + 1)->getImage().height());
-        QPixmap *pixmap=new QPixmap(WIDTH * 2 + pageMargin, HEIGHT);
+        int width1 = HEIGHT / pageIterator->getImage().height() * pageIterator->getImage().width();
+        int width2 = HEIGHT / (pageIterator+1)->getImage().height() * (pageIterator+1)->getImage().width();
+        QPixmap *pixmap=new QPixmap(width1+width2 + pageMargin, HEIGHT);
         pixmap->fill(Qt::transparent);
         currentPixmap = *pixmap;
         // Paint two pix map on one pixmap
         QPainter *painter=new QPainter(&currentPixmap); // New painter
-        painter->drawPixmap(0, 0, WIDTH, HEIGHT, QPixmap::fromImage(pageIterator->getImage()));
-        painter->drawPixmap(WIDTH + pageMargin, 0, WIDTH, HEIGHT, QPixmap::fromImage((pageIterator+1)->getImage()));
+        painter->drawPixmap(0, 0, width1, HEIGHT, QPixmap::fromImage(pageIterator->getImage()));
+        painter->drawPixmap(width1 + pageMargin, 0, width2, HEIGHT, QPixmap::fromImage((pageIterator+1)->getImage()));
         painter->~QPainter(); // destroy painter
     }
 
@@ -243,6 +246,11 @@ void ComicReader::resizeEvent(QResizeEvent *event)
     }
 }
 
+// Track mouse position to hide/show thumbnail list
+void ComicReader::mouseMoveEvent(QMouseEvent *event){
+    qDebug() << event->pos();
+}
+
 QSize ComicReader::sizeHint() const
 {
     return centerLabel->sizeHint()+QSize(0, ui->mainToolBar->height()+ui->statusBar->height() + ui->menuBar->height());
@@ -270,8 +278,8 @@ void ComicReader::loadPages()
 
     /*pageVector.append(*(new Page(*(new QImage(":/test/000.jpg")), 2)));
     pageVector.append(*(new Page(*(new QImage(":/test/002.jpg")), 3)));
-    pageVector.append(*(new Page(*(new QImage(":/test/001.jpg")), 1)));*/
-
+    pageVector.append(*(new Page(*(new QImage(":/test/001.jpg")), 1)));
+*/
     pageIterator = pageVector.begin();
 }
 
