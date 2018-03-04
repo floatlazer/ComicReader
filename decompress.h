@@ -2,9 +2,13 @@
 #define DECOMPRESS_H
 
 #include <QString>
+#include <QImage>
+#include <iostream>
+
 extern "C"
 {
-#include "unarr.h"
+    #include "unarr.h"
+    //#include "7z.h"
 }
 
 
@@ -17,10 +21,11 @@ public:
 
     //Open archive file and decompress
     void DecFiles(const char *Path);
-
     //get file from decompress archive
-    bool GetFiles(ar_archive *listing, const char *filename);
+    void GetFiles();
+    unsigned char buffer[102400];
     const char *filename;
+    size_t taille;
 
 private:
     ar_archive *listing;

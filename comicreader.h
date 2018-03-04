@@ -6,7 +6,10 @@
 #include <QLabel>
 #include <QScrollBar>
 #include <QScrollArea>
+
 #include "page.h"
+#include "decompress.h"
+#include <iostream>
 
 namespace Ui {
 class ComicReader;
@@ -53,6 +56,8 @@ private:
     bool isShowSideLabel;
     double scaleFactor;
     int zoomCount; // 0 if not zoomed
+    Decompress decom;
+
     // QAction
     QAction* openAct;
     QAction* prevAct;
