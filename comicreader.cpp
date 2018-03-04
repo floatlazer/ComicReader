@@ -13,7 +13,6 @@ ComicReader::ComicReader(QWidget *parent) :
     ui->setupUi(this);
     // page combo box
     ui->mainToolBar->addWidget(&pageComboBox);
-    connect(&pageComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged),[=](int index){ pageIterator = pageVector.begin() + index; setPage(); });
     centerLabel = ui->centerLabel;
     scaleFactor = 1.0;
     zoomCount = 0;
@@ -27,6 +26,7 @@ ComicReader::ComicReader(QWidget *parent) :
     fitToWindowAct->setChecked(true);
     normalSizeAct->setEnabled(true);
     doublePageAct->setEnabled(true);
+    connect(&pageComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged),[=](int index){qDebug()<<"page index change"; pageIterator = pageVector.begin() + index; setPage(); });
     setPage();
     isFirstPage = false;
     adjustSize();
@@ -255,20 +255,19 @@ QSize ComicReader::sizeHint() const
 // Load image and add to pageVector
 void ComicReader::loadPages()
 {
+    qDebug()<<"loadPages";
     QString path1 = "/Users/zhangxuan/Desktop/comicExample_big";
     QString path2 = "/Users/zhangxuan/Desktop/comicExample_normal";
     int totalPages = 52;
-    for(int i = 1; i<=totalPages; i++)
-    {
-        pageVector.append(*(new Page(i)));
-        pageComboBox.addItem(QString("%1 / %2").arg(i).arg(totalPages));
-    }
+    pageVector.resize(totalPages);
     int n = 1;
-    for(auto i = pageVector.begin(); i<pageVector.end(); i++)
+    for(auto i = pageVector.begin(); i < pageVector.end(); i++)
     {
         QString number = QString("%1").arg(n, 3, 10, QChar('0'));
         QString p = path1 + "/"+ number+".png";
         i->setImage(*(new QImage(p)));
+        i->setPageNumber(i-pageVector.begin()+1);
+        pageComboBox.addItem(QString("%1 / %2").arg(i-pageVector.begin()+1).arg(totalPages));
         qDebug()<<p;
         n++;
     }
