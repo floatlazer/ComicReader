@@ -253,16 +253,15 @@ QSize ComicReader::sizeHint() const
 void ComicReader::loadPages()
 {
     //Decompress decom;
-    decom.DecFiles("/Users/LIZhufeng/Documents/in204_cbr/compress.tar");
+    decom.DecFiles("/Users/zhangxuan/workspace/ComicReader/compress.tar");
     decom.GetFiles(); //buffer in this
     QImage XUAN;
     XUAN.loadFromData(decom.buffer,decom.taille,"JPG");
-    centerLabel->setPixmap(QPixmap::fromImage(XUAN));
     qDebug()<<decom.taille;
     //pageVector.append(*(new Page(new QImage(":/test/001.jpg"), 1)));
-    pageVector.append(*(new Page(&XUAN,1)));
+    pageVector.append(*(new Page(1)));
     pageIterator = pageVector.begin();
-    //pageIterator->setImage(&XUAN);
+    pageIterator->setImage(XUAN);
 }
 
 // Trigger show/hide center label and side label
