@@ -11,6 +11,9 @@ ComicReader::ComicReader(QWidget *parent) :
     ui(new Ui::ComicReader)
 {
     ui->setupUi(this);
+    // page combo box
+    ui->mainToolBar->addWidget(&pageComboBox);
+    connect(&pageComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged),[=](int index){ pageIterator = pageVector.begin() + index; setPage(); });
     centerLabel = ui->centerLabel;
     scaleFactor = 1.0;
     zoomCount = 0;
@@ -19,7 +22,6 @@ ComicReader::ComicReader(QWidget *parent) :
     sideLabel = ui->sideLabel;
     centerLabel->setScaledContents(false);
     sideLabel->setVisible(false);
-    setMouseTracking(true);
     createActions();
     loadPages();
     fitToWindowAct->setChecked(true);
@@ -42,8 +44,6 @@ void ComicReader::createActions()
     // Create column "Control" and "View" in the menubar and create a control toolbar
     QMenu * controlMenu = menuBar()->addMenu(tr("&Control"));
     QMenu * viewMenu = menuBar()->addMenu(tr("&View"));
-    QToolBar *controlToolBar = addToolBar(tr("Control"));
-
     // Open action
     openAct = new QAction (tr("&Open"), this);
     openAct->setStatusTip(tr("Open"));
@@ -51,12 +51,12 @@ void ComicReader::createActions()
     controlMenu->addAction(openAct);
 
     // Trigger hide/show sideLabel action
-    const QIcon triggerIcon = QIcon::fromTheme("document-new", QIcon(":/icon/doubleArrow.png"));
+    /*const QIcon triggerIcon = QIcon::fromTheme("document-new", QIcon(":/icon/doubleArrow.png"));
     triggerAct = new QAction(triggerIcon, tr("&Show/hide side label"), this);
     triggerAct->setStatusTip(tr("Show/hide side label"));
     connect(triggerAct, &QAction::triggered, this, &ComicReader::triggerSideLabel);
     viewMenu->addAction(triggerAct);
-    controlToolBar->addAction(triggerAct);
+    ui->mainToolBar->addAction(triggerAct);*/
 
     // Previous page action
     const QIcon prevIcon = QIcon::fromTheme("document-new", QIcon(":/icon/leftArrow.png"));
@@ -65,7 +65,7 @@ void ComicReader::createActions()
     prevAct->setStatusTip(tr("Previous page"));
     connect(prevAct, &QAction::triggered, this, &ComicReader::prevPage);
     controlMenu->addAction(prevAct);
-    controlToolBar->addAction(prevAct);
+    ui->mainToolBar->addAction(prevAct);
 
     // Next page action
     const QIcon nextIcon = QIcon::fromTheme("document-new", QIcon(":/icon/rightArrow.png"));
@@ -74,7 +74,7 @@ void ComicReader::createActions()
     nextAct->setStatusTip(tr("Next page"));
     connect(nextAct, &QAction::triggered, this, &ComicReader::nextPage);
     controlMenu->addAction(nextAct);
-    controlToolBar->addAction(nextAct);
+    ui->mainToolBar->addAction(nextAct);
 
     // ZoomIn action
     const QIcon zoomInIcon = QIcon::fromTheme("document-new", QIcon(":/icon/zoomIn.png"));
@@ -83,7 +83,7 @@ void ComicReader::createActions()
     zoomInAct->setStatusTip(tr("Zoom In"));
     connect(zoomInAct, &QAction::triggered, this, &ComicReader::zoomIn);
     viewMenu->addAction(zoomInAct);
-    controlToolBar->addAction(zoomInAct);
+    ui->mainToolBar->addAction(zoomInAct);
 
     // ZoomOut action
     const QIcon zoomOutIcon = QIcon::fromTheme("document-new", QIcon(":/icon/zoomOut.png"));
@@ -92,7 +92,7 @@ void ComicReader::createActions()
     zoomOutAct->setStatusTip(tr("Zoom Out"));
     connect(zoomOutAct, &QAction::triggered, this, &ComicReader::zoomOut);
     viewMenu->addAction(zoomOutAct);
-    controlToolBar->addAction(zoomOutAct);
+    ui->mainToolBar->addAction(zoomOutAct);
 
     // NormalSize action
     normalSizeAct = viewMenu->addAction(tr("&Normal Size"), this, &ComicReader::normalSize);
@@ -170,6 +170,8 @@ void ComicReader::setPage()
     {
         scaleImage(1.0); // Keep scaleFactor
     }
+    // Set pageComboBox
+    pageComboBox.setCurrentIndex(pageIterator - pageVector.begin());
 }
 
 void ComicReader::zoomIn()
@@ -233,7 +235,6 @@ void ComicReader::scaleImageToWindow()
     double factorHeight = double(centerLabel->pixmap()->height())/double(currentPixmap.height());
     scaleFactor = factorWidth < factorHeight ? factorWidth : factorHeight;
     qDebug()<<"scaleImageToWindow"<<scaleFactor;
-
 }
 
 // Resize image when resize the window
@@ -246,11 +247,6 @@ void ComicReader::resizeEvent(QResizeEvent *event)
     }
 }
 
-// Track mouse position to hide/show thumbnail list
-void ComicReader::mouseMoveEvent(QMouseEvent *event){
-    qDebug() << event->pos();
-}
-
 QSize ComicReader::sizeHint() const
 {
     return centerLabel->sizeHint()+QSize(0, ui->mainToolBar->height()+ui->statusBar->height() + ui->menuBar->height());
@@ -261,10 +257,11 @@ void ComicReader::loadPages()
 {
     QString path1 = "/Users/zhangxuan/Desktop/comicExample_big";
     QString path2 = "/Users/zhangxuan/Desktop/comicExample_normal";
-
-    for(int i = 1; i<=52; i++)
+    int totalPages = 52;
+    for(int i = 1; i<=totalPages; i++)
     {
         pageVector.append(*(new Page(i)));
+        pageComboBox.addItem(QString("%1 / %2").arg(i).arg(totalPages));
     }
     int n = 1;
     for(auto i = pageVector.begin(); i<pageVector.end(); i++)

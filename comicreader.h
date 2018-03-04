@@ -6,7 +6,7 @@
 #include <QLabel>
 #include <QScrollBar>
 #include <QScrollArea>
-#include <QMouseEvent>
+#include <QComboBox>
 #include "page.h"
 
 namespace Ui {
@@ -51,6 +51,7 @@ private:
     QLabel* centerLabel;
     QScrollArea* centerScrollArea;
     QLabel* sideLabel;
+    QComboBox pageComboBox; // comboBox to show page number
     bool isShowSideLabel;
     double scaleFactor;
     int zoomCount; // 0 if not zoomed
@@ -69,7 +70,6 @@ private:
 protected:
     virtual void resizeEvent(QResizeEvent *event);
     virtual QSize sizeHint() const;
-    virtual void mouseMoveEvent(QMouseEvent *event);
 };
 
 #endif // COMICREADER_H
