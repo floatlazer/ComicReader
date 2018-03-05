@@ -16,7 +16,7 @@ extern "C"
 class Decompress
 {
 public:
-    unsigned char buffer[102400];
+    unsigned char buffer[1024000];
     const char *pathName;
     const char *filename;
     size_t taille;

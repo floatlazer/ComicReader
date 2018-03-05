@@ -269,7 +269,7 @@ void ComicReader::loadPages()
     decom.GetFiles(); //buffer in this
     ExtractedImage2.loadFromData(decom.buffer,decom.taille,"JPG");
     ImageVector.append(ExtractedImage2);
-    //can not append
+    //can not append the next page...
     //pageVector.append(*(new Page(3)));
     //pageIterator+=1;
     //pageIterator->setImage(ImageVector.at(1));

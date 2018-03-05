@@ -5,8 +5,8 @@ void Decompress::DecFiles()
 {
     streaming=ar_open_file(pathName);
     listing = ar_open_rar_archive(streaming);
-    //if (!listing)
-   //   listing = ar_open_7z_archive(streaming);
+    if (!listing)
+        listing = ar_open_zip_archive(streaming,false); //set second parameter false for extracting file non-deflate
     if (!listing)
         listing = ar_open_tar_archive(streaming);
 }
