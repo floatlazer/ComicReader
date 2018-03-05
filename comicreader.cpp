@@ -22,6 +22,10 @@ ComicReader::ComicReader(QWidget *parent) :
     centerLabel->setScaledContents(false);
     sideLabel->setVisible(false);
     createActions();
+    // Connect pageLoader thread
+    pageLoader.moveToThread(&loadPagesThread);
+    connect(this, &ComicReader::startLoadPages, &pageLoader, &PageLoader::doLoadPages);
+    loadPagesThread.start();
     loadPages();
     fitToWindowAct->setChecked(true);
     normalSizeAct->setEnabled(true);
@@ -36,6 +40,8 @@ ComicReader::ComicReader(QWidget *parent) :
 ComicReader::~ComicReader()
 {
     pageVector.clear();
+    loadPagesThread.terminate();
+    loadPagesThread.wait();
     delete ui;
 }
 
@@ -144,8 +150,15 @@ void ComicReader::setPage()
     // Enable actions
     zoomInAct->setEnabled(true);
     zoomOutAct->setEnabled(true);
+    // Check if page is loaded
+    while(!pageIterator->isLoaded()) {qDebug()<<"Wait page to be loaded";}
+    if(doublePageAct->isChecked() && pageIterator < pageLoader.pageVector.end()-1)
+    {
+        while(!(pageIterator+1)->isLoaded()) qDebug()<<"Wait second page to be loaded";
+    }
+    qDebug()<<"SIZE"<<pageLoader.pageVector.size();
     // Set pixmap
-    if(!doublePageAct->isChecked() || pageIterator == pageVector.end()-1)     // Single page mode
+    if(!doublePageAct->isChecked() || pageIterator == pageLoader.pageVector.end()-1)     // Single page mode
         currentPixmap.convertFromImage(pageIterator->getImage());
     else{                  // Double pages mode
         int pageMargin = 30;
@@ -252,31 +265,14 @@ QSize ComicReader::sizeHint() const
     return centerLabel->sizeHint()+QSize(0, ui->mainToolBar->height()+ui->statusBar->height() + ui->menuBar->height());
 }
 
-// Load image and add to pageVector
+// Load image and add to pageVector asynchronously
 void ComicReader::loadPages()
 {
-    qDebug()<<"loadPages";
     QString path1 = "/Users/zhangxuan/Desktop/comicExample_big";
     QString path2 = "/Users/zhangxuan/Desktop/comicExample_normal";
-    int totalPages = 52;
-    pageVector.resize(totalPages);
-    int n = 1;
-    for(auto i = pageVector.begin(); i < pageVector.end(); i++)
-    {
-        QString number = QString("%1").arg(n, 3, 10, QChar('0'));
-        QString p = path1 + "/"+ number+".png";
-        i->setImage(*(new QImage(p)));
-        i->setPageNumber(i-pageVector.begin()+1);
-        pageComboBox.addItem(QString("%1 / %2").arg(i-pageVector.begin()+1).arg(totalPages));
-        qDebug()<<p;
-        n++;
-    }
-
-    /*pageVector.append(*(new Page(*(new QImage(":/test/000.jpg")), 2)));
-    pageVector.append(*(new Page(*(new QImage(":/test/002.jpg")), 3)));
-    pageVector.append(*(new Page(*(new QImage(":/test/001.jpg")), 1)));
-*/
-    pageIterator = pageVector.begin();
+    emit startLoadPages(path1);
+    pageLoader.pageVector.resize(52);
+    pageIterator = pageLoader.pageVector.begin();
 }
 
 // Trigger show/hide center label and side label

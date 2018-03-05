@@ -1,0 +1,18 @@
+#ifndef LOADPAGETHREAD_H
+#define LOADPAGETHREAD_H
+
+// Thread to load images asynchronously
+class LoadPage : public QT
+{
+    Q_OBJECT
+public:
+    LoadPageThread();
+    void run() override
+    {
+            
+    }
+signals:
+    void pageLoaded(const int &pageNumber);
+};
+
+#endif // LOADPAGETHREAD_H

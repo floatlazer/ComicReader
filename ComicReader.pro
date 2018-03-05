@@ -26,11 +26,13 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         main.cpp \
         comicreader.cpp \
-    page.cpp
+    page.cpp \
+    pageloader.cpp
 
 HEADERS += \
         comicreader.h \
-    page.h
+    page.h \
+    pageloader.h
 
 FORMS += \
         comicreader.ui

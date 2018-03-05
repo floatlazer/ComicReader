@@ -7,7 +7,9 @@
 #include <QScrollBar>
 #include <QScrollArea>
 #include <QComboBox>
+#include <QThread>
 #include "page.h"
+#include "pageloader.h"
 
 namespace Ui {
 class ComicReader;
@@ -20,6 +22,13 @@ class ComicReader : public QMainWindow
 public:
     explicit ComicReader(QWidget *parent = 0);
     ~ComicReader();
+    QVector<Page> pageVector; // The vector of loaded pages
+
+signals:
+    void startLoadPages(const QString& path); // signal to start loading pages
+
+public slots:
+    void loadPages();
 
 private:
     Ui::ComicReader *ui;
@@ -27,7 +36,6 @@ private:
     void createActions();
     void updateActions();
     // Images
-    void loadPages();
     void setPage();
     void zoomIn();
     void zoomOut();
@@ -45,7 +53,6 @@ private:
     void scaleImageToWindow();
     bool isFirstPage;
 
-    QVector<Page> pageVector; // The vector of loaded pages
     QVector<Page>::Iterator pageIterator;
     QPixmap currentPixmap;
     QLabel* centerLabel;
@@ -67,6 +74,8 @@ private:
     QAction* doublePageAct;
     QString fileName;
 
+    QThread loadPagesThread;
+    PageLoader pageLoader;
 protected:
     virtual void resizeEvent(QResizeEvent *event);
     virtual QSize sizeHint() const;
