@@ -49,6 +49,7 @@ private:
 
     QVector<Page> pageVector; // The vector of loaded pages
     QVector<Page>::Iterator pageIterator;
+    QVector<QImage> ImageVector; //the vector of saving image data
     QPixmap currentPixmap;
     QLabel* centerLabel;
     QScrollArea* centerScrollArea;

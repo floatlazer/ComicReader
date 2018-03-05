@@ -20,6 +20,7 @@ ComicReader::ComicReader(QWidget *parent) :
     centerLabel->setScaledContents(true);
     sideLabel->setVisible(false);
     createActions();
+    open();
     loadPages();
     fitToWindowAct->setChecked(true);
     normalSizeAct->setEnabled(true);
@@ -252,16 +253,26 @@ QSize ComicReader::sizeHint() const
 // Load image and add to pageVector
 void ComicReader::loadPages()
 {
-    //Decompress decom;
-    decom.DecFiles("/Users/zhangxuan/workspace/ComicReader/compress.tar");
-    decom.GetFiles(); //buffer in this
-    QImage XUAN;
-    XUAN.loadFromData(decom.buffer,decom.taille,"JPG");
     qDebug()<<decom.taille;
-    //pageVector.append(*(new Page(new QImage(":/test/001.jpg"), 1)));
-    pageVector.append(*(new Page(1)));
+    pageVector.append(*(new Page(*new QImage(":/test/001.jpg"), 1)));
     pageIterator = pageVector.begin();
-    pageIterator->setImage(XUAN);
+
+    QImage ExtractedImage;
+    decom.GetFiles(); //buffer in this
+    ExtractedImage.loadFromData(decom.buffer,decom.taille,"JPG");
+    ImageVector.append(ExtractedImage);
+    pageVector.append(*(new Page(2)));
+    pageIterator+=1;
+    pageIterator->setImage(ImageVector.at(0));
+
+    QImage ExtractedImage2;
+    decom.GetFiles(); //buffer in this
+    ExtractedImage2.loadFromData(decom.buffer,decom.taille,"JPG");
+    ImageVector.append(ExtractedImage2);
+    //pageVector.append(*(new Page(3)));
+    //pageIterator+=1;
+    //pageIterator->setImage(ImageVector.at(1));
+
 }
 
 // Trigger show/hide center label and side label
@@ -273,11 +284,19 @@ void ComicReader::triggerSideLabel()
 
 void ComicReader::open()
 {
+    //clear old comicbook before open new one
+    if(pageVector.isEmpty() && ImageVector.isEmpty())
+    {
+        pageVector.clear();
+        ImageVector.clear();
+    }
     // Select a png, jpg, cbr or cbz
     qDebug()<<"open"<<QStandardPaths::writableLocation(QStandardPaths::HomeLocation);
     fileName = QFileDialog::getOpenFileName(this, tr("Open Image"),
                QStandardPaths::writableLocation(QStandardPaths::HomeLocation),
-               tr("Image Files (*.png *.jpg *.cbr *.cbz)"));
+               tr("Image Files (*.png *.jpg *.cbr *.cbz *.rar *.zip *.tar)"));
+    decom.pathName=fileName.toStdString().c_str();   //convert Qstring to const char *
+    decom.DecFiles();
     qDebug()<<"Filename"<<fileName;
 }
 

@@ -16,16 +16,18 @@ extern "C"
 class Decompress
 {
 public:
-    Decompress();
-    ~Decompress();
-
-    //Open archive file and decompress
-    void DecFiles(const char *Path);
-    //get file from decompress archive
-    void GetFiles();
     unsigned char buffer[102400];
+    const char *pathName;
     const char *filename;
     size_t taille;
+
+    Decompress();
+    ~Decompress();
+    //Open archive file and decompress
+    void DecFiles();
+    //get file from decompress archive
+    void GetFiles();
+
 
 private:
     ar_archive *listing;
