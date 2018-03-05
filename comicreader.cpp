@@ -23,6 +23,8 @@ ComicReader::ComicReader(QWidget *parent) :
     sideLabel->setVisible(false);
     createActions();
     // Connect pageLoader thread
+    pageLoader.setPageVector(&pageVector);
+    pageLoader.setPageComboBox(&pageComboBox);
     pageLoader.moveToThread(&loadPagesThread);
     connect(this, &ComicReader::startLoadPages, &pageLoader, &PageLoader::doLoadPages);
     loadPagesThread.start();
@@ -150,15 +152,12 @@ void ComicReader::setPage()
     // Enable actions
     zoomInAct->setEnabled(true);
     zoomOutAct->setEnabled(true);
-    // Check if page is loaded
-    while(!pageIterator->isLoaded()) {qDebug()<<"Wait page to be loaded";}
-    if(doublePageAct->isChecked() && pageIterator < pageLoader.pageVector.end()-1)
-    {
-        while(!(pageIterator+1)->isLoaded()) qDebug()<<"Wait second page to be loaded";
-    }
-    qDebug()<<"SIZE"<<pageLoader.pageVector.size();
+    // Check if page is loaded, wait for page loading if not
+    while(!pageIterator->isLoaded());
+    if(doublePageAct->isChecked() && pageIterator < pageVector.end()-1)
+        while(!(pageIterator+1)->isLoaded()); // Wait second page to be loaded
     // Set pixmap
-    if(!doublePageAct->isChecked() || pageIterator == pageLoader.pageVector.end()-1)     // Single page mode
+    if(!doublePageAct->isChecked() || pageIterator == pageVector.end()-1)     // Single page mode
         currentPixmap.convertFromImage(pageIterator->getImage());
     else{                  // Double pages mode
         int pageMargin = 30;
@@ -271,8 +270,8 @@ void ComicReader::loadPages()
     QString path1 = "/Users/zhangxuan/Desktop/comicExample_big";
     QString path2 = "/Users/zhangxuan/Desktop/comicExample_normal";
     emit startLoadPages(path1);
-    pageLoader.pageVector.resize(52);
-    pageIterator = pageLoader.pageVector.begin();
+    while(pageVector.empty()); // Wait to load the first element
+    pageIterator = pageVector.begin();
 }
 
 // Trigger show/hide center label and side label

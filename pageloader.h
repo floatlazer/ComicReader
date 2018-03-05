@@ -9,12 +9,14 @@ class PageLoader : public QObject
 {
     Q_OBJECT
 public:
-    QVector<Page> pageVector;
-    QComboBox pageComboBox;
+    PageLoader();
+    void setPageVector(QVector<Page>* _pageVector);
+    void setPageComboBox(QComboBox* _pageComboBox);
 public slots:
     void doLoadPages(const QString &path);
-//private:
-
+private:
+    QVector<Page>* pageVector;
+    QComboBox* pageComboBox;
 };
 
 #endif // LOADPAGETHREAD_H
