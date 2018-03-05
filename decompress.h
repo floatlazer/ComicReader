@@ -4,6 +4,7 @@
 #include <QString>
 #include <QImage>
 #include <iostream>
+#include <QDebug>
 
 extern "C"
 {
@@ -27,11 +28,14 @@ public:
     void DecFiles();
     //get file from decompress archive
     void GetFiles();
+    //get file number in the archive
+    int GetNumber();
 
 
 private:
     ar_archive *listing;
     ar_stream *streaming;
+    int indicator; //zip indicator
 };
 
 #endif // DECOMPRESS_H

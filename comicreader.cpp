@@ -254,22 +254,24 @@ QSize ComicReader::sizeHint() const
 void ComicReader::loadPages()
 {
     qDebug()<<decom.taille;
-    pageVector.append(*(new Page(*new QImage(":/test/001.jpg"), 1)));
+    pageVector.append(*(new Page(*new QImage(":/test/002.jpg"), 1)));
     pageIterator = pageVector.begin();
-
+    qDebug()<<"number in archive"<<decom.GetNumber();
     QImage ExtractedImage;
     decom.GetFiles(); //buffer in this
     ExtractedImage.loadFromData(decom.buffer,decom.taille,"JPG");
+    qDebug()<<"Image"<<ExtractedImage;
     ImageVector.append(ExtractedImage);
     pageVector.append(*(new Page(2)));
     pageIterator+=1;
     pageIterator->setImage(ImageVector.at(0));
 
-    QImage ExtractedImage2;
+    //QImage ExtractedImage2;
     decom.GetFiles(); //buffer in this
-    ExtractedImage2.loadFromData(decom.buffer,decom.taille,"JPG");
-    ImageVector.append(ExtractedImage2);
-    //can not append
+    decom.GetFiles();
+    decom.GetFiles();
+    //ExtractedImage2.loadFromData(decom.buffer,decom.taille,"JPG");
+    //ImageVector.append(ExtractedImage2);
     //pageVector.append(*(new Page(3)));
     //pageIterator+=1;
     //pageIterator->setImage(ImageVector.at(1));
@@ -286,7 +288,7 @@ void ComicReader::triggerSideLabel()
 void ComicReader::open()
 {
     //clear old comicbook before open new one
-    if(pageVector.isEmpty() && ImageVector.isEmpty())
+    if(!pageVector.isEmpty() || !ImageVector.isEmpty())
     {
         pageVector.clear();
         ImageVector.clear();
@@ -303,7 +305,6 @@ void ComicReader::open()
         std::cout<<"voir si entrer"<<std::endl;
         QApplication::quit();
     }
-    std::cout<<"voir si sort"<<std::endl;
     decom.pathName=fileName.toStdString().c_str();
     decom.DecFiles();
     qDebug()<<"Filename"<<fileName;
