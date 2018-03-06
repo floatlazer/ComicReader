@@ -22,7 +22,7 @@ public:
     // Open archive file and decompress
     void decFiles();
     // Get file from decompress archive
-    void getFiles();
+    void getFiles(bool parse);
     // Get file number in the archive
     int getEntryNumber();
     size_t getEntrySize();
@@ -34,7 +34,7 @@ private:
     ar_archive *listing;
     ar_stream *streaming;
     int indicator; //zip indicator
-    unsigned char buffer[1024*1024*5];
+    unsigned char buffer[1024*1024*2];
     const char *path;
     const char *entryName;
     size_t entrySize;

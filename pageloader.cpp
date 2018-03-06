@@ -27,7 +27,11 @@ void PageLoader::doLoadPages(const QString &path)
     pageVector->resize(decom.getEntryNumber());
     for(auto i = pageVector->begin(); i < pageVector->end(); i++)
     {
-        decom.getFiles(); //buffer in this
+        if(i == pageVector->begin())
+            decom.getFiles(false); //buffer in this
+        else
+            decom.getFiles(true); //buffer in this
+
         QImage* img = new QImage();
         img->loadFromData(decom.getBuffer(),decom.getEntrySize());
         i->setImage(*img);

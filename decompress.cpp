@@ -27,6 +27,7 @@ void Decompress::decFiles()
         if (indicator==1)
             next=ar_parse_entry(listing);
         next=ar_parse_entry(listing);
+
         count+=1;
     }
     count-=1;
@@ -46,13 +47,16 @@ int Decompress::getEntryNumber()
     return entryNumber;
 }
 
-void Decompress::getFiles()
+void Decompress::getFiles(bool parse)
 {
-    if (indicator==1)
+    if(parse)
     {
+        if (indicator==1)
+        {
+            ar_parse_entry(listing);
+        }
         ar_parse_entry(listing);
     }
-    ar_parse_entry(listing);
     entryName=ar_entry_get_name(listing);
     entrySize = ar_entry_get_size(listing);
     ar_entry_uncompress(listing, buffer, entrySize);
