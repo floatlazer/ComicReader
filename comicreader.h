@@ -53,7 +53,6 @@ private:
     bool isFirstPage;
 
     QVector<Page>::Iterator pageIterator;
-    QVector<QImage> ImageVector; //the vector of saving image data
     QPixmap currentPixmap;
     QLabel* centerLabel;
     QScrollArea* centerScrollArea;

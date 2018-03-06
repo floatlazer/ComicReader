@@ -10,32 +10,31 @@ ComicReader::ComicReader(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::ComicReader)
 {
+    // Set up ui
     ui->setupUi(this);
-    // page combo box
-    ui->mainToolBar->addWidget(&pageComboBox);
+    ui->mainToolBar->addWidget(&pageComboBox);    // page combo box
+    connect(&pageComboBox, QOverload<int>::of(&QComboBox::activated),[=](int index){qDebug()<<"page index change"; pageIterator = pageVector.begin() + index; setPage(); });
     centerLabel = ui->centerLabel;
+    centerScrollArea = ui->centerScrollArea;
+    centerLabel->setScaledContents(true);
+    // Init params
     scaleFactor = 1.0;
     zoomCount = 0;
     isFirstPage = true;
-    centerScrollArea = ui->centerScrollArea;
-    centerLabel->setScaledContents(true);
+    // Create Actions
     createActions();
-    open();
+    fitToWindowAct->setChecked(true);
+    normalSizeAct->setEnabled(true);
+    doublePageAct->setEnabled(true);
+
     // Connect pageLoader thread
     pageLoader.setPageVector(&pageVector);
     pageLoader.setPageComboBox(&pageComboBox);
     pageLoader.moveToThread(&loadPagesThread);
     connect(this, &ComicReader::startLoadPages, &pageLoader, &PageLoader::doLoadPages);
     loadPagesThread.start();
-    loadPages();
-    fitToWindowAct->setChecked(true);
-    normalSizeAct->setEnabled(true);
-    doublePageAct->setEnabled(true);
-    connect(&pageComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged),[=](int index){qDebug()<<"page index change"; pageIterator = pageVector.begin() + index; setPage(); });
-    setPage();
-    isFirstPage = false;
-    adjustSize();
-
+    // Open archive
+    open();
 }
 
 ComicReader::~ComicReader()
@@ -46,95 +45,45 @@ ComicReader::~ComicReader()
     delete ui;
 }
 
-void ComicReader::createActions()
+void ComicReader::open()
 {
-    // Create column "Control" and "View" in the menubar and create a control toolbar
-    QMenu * controlMenu = menuBar()->addMenu(tr("&Control"));
-    QMenu * viewMenu = menuBar()->addMenu(tr("&View"));
-    // Open action
-    openAct = new QAction (tr("&Open"), this);
-    openAct->setStatusTip(tr("Open"));
-    connect(openAct, &QAction::triggered, this, &ComicReader::open);
-    controlMenu->addAction(openAct);
-
-    // Previous page action
-    const QIcon prevIcon = QIcon::fromTheme("document-new", QIcon(":/icon/leftArrow.png"));
-    prevAct = new QAction(prevIcon, tr("&Previous page"), this);
-    prevAct->setShortcuts(QKeySequence::MoveToPreviousChar);
-    prevAct->setStatusTip(tr("Previous page"));
-    connect(prevAct, &QAction::triggered, this, &ComicReader::prevPage);
-    controlMenu->addAction(prevAct);
-    ui->mainToolBar->addAction(prevAct);
-
-    // Next page action
-    const QIcon nextIcon = QIcon::fromTheme("document-new", QIcon(":/icon/rightArrow.png"));
-    nextAct = new QAction(nextIcon, tr("&Next page"), this);
-    nextAct->setShortcuts(QKeySequence::MoveToNextChar);
-    nextAct->setStatusTip(tr("Next page"));
-    connect(nextAct, &QAction::triggered, this, &ComicReader::nextPage);
-    controlMenu->addAction(nextAct);
-    ui->mainToolBar->addAction(nextAct);
-
-    // ZoomIn action
-    const QIcon zoomInIcon = QIcon::fromTheme("document-new", QIcon(":/icon/zoomIn.png"));
-    zoomInAct = new QAction(zoomInIcon, tr("&Zoom in"), this);
-    zoomInAct->setShortcuts(QKeySequence::ZoomIn);
-    zoomInAct->setStatusTip(tr("Zoom In"));
-    connect(zoomInAct, &QAction::triggered, this, &ComicReader::zoomIn);
-    viewMenu->addAction(zoomInAct);
-    ui->mainToolBar->addAction(zoomInAct);
-
-    // ZoomOut action
-    const QIcon zoomOutIcon = QIcon::fromTheme("document-new", QIcon(":/icon/zoomOut.png"));
-    zoomOutAct = new QAction(zoomOutIcon, tr("&Zoom out"), this);
-    zoomOutAct->setShortcuts(QKeySequence::ZoomOut);
-    zoomOutAct->setStatusTip(tr("Zoom Out"));
-    connect(zoomOutAct, &QAction::triggered, this, &ComicReader::zoomOut);
-    viewMenu->addAction(zoomOutAct);
-    ui->mainToolBar->addAction(zoomOutAct);
-
-    // NormalSize action
-    normalSizeAct = viewMenu->addAction(tr("&Normal Size"), this, &ComicReader::normalSize);
-    normalSizeAct->setShortcut(tr("Ctrl+S"));
-    normalSizeAct->setCheckable(true);
-    viewMenu->addSeparator();
-
-    // FitToWindow action
-    fitToWindowAct = viewMenu->addAction(tr("&Fit to Window"), this, &ComicReader::fitToWindow);
-    fitToWindowAct->setCheckable(true);
-    fitToWindowAct->setShortcut(tr("Ctrl+F"));
-
-    // DoublePageMode action
-    doublePageAct = viewMenu->addAction(tr("&Double page mode"), this, &ComicReader::triggerDoublePage);
-    doublePageAct->setCheckable(true);
-    doublePageAct->setShortcut(tr("Ctrl+D"));
-
-    // Set default status
-    normalSizeAct->setEnabled(false);
-    normalSizeAct->setChecked(false);
-    zoomInAct->setEnabled(false);
-    zoomOutAct->setEnabled(false);
-    fitToWindowAct->setEnabled(false);
-    fitToWindowAct->setChecked(false);
-    doublePageAct->setEnabled(false);
-    doublePageAct->setChecked(false);
+    // Clear old comicbook before open new one
+    if(!pageVector.isEmpty())
+    {
+        qDebug() << "Clear old data";
+        pageVector.clear();
+    }
+    if(pageComboBox.count() > 0)
+    {
+        qDebug()<<"Clear pageComboBox";
+        pageComboBox.clear();
+    }
+    // Select a png, jpg, cbr or cbz
+    qDebug()<<"open"<<QStandardPaths::writableLocation(QStandardPaths::HomeLocation);
+    filePath = QFileDialog::getOpenFileName(this, tr("Open Image"),
+               QStandardPaths::writableLocation(QStandardPaths::HomeLocation),
+               tr("Image Files (*.png *.jpg *.cbr *.cbz *.rar *.zip *.tar)"));
+    // Quit application if nothing is selected
+    if(filePath.isEmpty() || filePath == NULL)
+    {
+        qDebug()<<"cancel";
+        exit(0);
+    }
+    // Load pages
+    loadPages();
+    // Show page
+    setPage();
+    isFirstPage = false;
+    adjustSize(); // Adjust window size to the first image
 }
 
-// Note that use check will take effect after actions
-void ComicReader::updateActions()
+// Load image and add to pageVector asynchronously
+void ComicReader::loadPages()
 {
-    if(normalSizeAct->isEnabled())
-    {
-        normalSizeAct->setEnabled(false);
-        fitToWindowAct->setEnabled(true);
-        fitToWindowAct->setChecked(false);
-    }
-    else
-    {
-        fitToWindowAct->setEnabled(false);
-        normalSizeAct->setEnabled(true);
-        normalSizeAct->setChecked(false);
-    }
+    qDebug()<<"Load Pages";
+    emit startLoadPages(filePath);
+    while(pageVector.empty()); // Wait to load the first element
+    pageIterator=pageVector.begin();
 }
 
 void ComicReader::setPage()
@@ -177,6 +126,45 @@ void ComicReader::setPage()
     pageComboBox.setCurrentIndex(pageIterator - pageVector.begin());
 }
 
+void ComicReader::prevPage()
+{
+    if(!doublePageAct->isChecked())
+    {
+        if(pageIterator != pageVector.begin())
+        {
+            pageIterator--;
+            setPage();
+        }
+    }
+    else
+    {
+        if(pageIterator >= pageVector.begin()+1)
+        {
+            pageIterator-=2;
+            setPage();
+        }
+    }
+}
+
+void ComicReader::nextPage()
+{
+    if(!doublePageAct->isChecked()){
+        if(pageIterator < pageVector.end()-1)
+        {
+            pageIterator++;
+            setPage();
+        }
+    }
+    else
+    {
+        if(pageIterator < pageVector.end()-2)
+        {
+            pageIterator+=2;
+            setPage();
+        }
+    }
+}
+
 void ComicReader::zoomIn()
 {
     double factor = 1.25;
@@ -204,6 +192,11 @@ void ComicReader::scaleImage(double factor)
     // Disable zooming if too large or too small
     zoomInAct->setEnabled(scaleFactor < 3.0);
     zoomOutAct->setEnabled(scaleFactor > 0.333);
+}
+
+void ComicReader::adjustScrollBar(QScrollBar *scrollBar, double factor)
+{
+    scrollBar->setValue(int(factor * scrollBar->value() + ((factor - 1) * scrollBar->pageStep()/2)));
 }
 
 void ComicReader::normalSize()
@@ -255,58 +248,5 @@ QSize ComicReader::sizeHint() const
     return centerLabel->sizeHint()+QSize(0, ui->mainToolBar->height()+ui->statusBar->height() + ui->menuBar->height());
 }
 
-// Load image and add to pageVector asynchronously
-void ComicReader::loadPages()
-{
-    //QString path1 = "/Users/zhangxuan/Desktop/comicExample_big";
-    //QString path2 = "/Users/zhangxuan/Desktop/comicExample_normal";
-    emit startLoadPages(filePath);
-    while(pageVector.empty()); // Wait to load the first element
-    pageIterator=pageVector.begin();
-
-}
-
-void ComicReader::open()
-{
-    //clear old comicbook before open new one
-    if(!pageVector.isEmpty() || !ImageVector.isEmpty())
-    {
-        pageVector.clear();
-        ImageVector.clear();
-    }
-    // Select a png, jpg, cbr or cbz
-    qDebug()<<"open"<<QStandardPaths::writableLocation(QStandardPaths::HomeLocation);
-    filePath = QFileDialog::getOpenFileName(this, tr("Open Image"),
-               QStandardPaths::writableLocation(QStandardPaths::HomeLocation),
-               tr("Image Files (*.png *.jpg *.cbr *.cbz *.rar *.zip *.tar)"));
-    if(filePath.isEmpty() || filePath == NULL) // Quit application
-    {
-        qDebug()<<"cancel";
-        exit(0);
-    }
-}
-
-void ComicReader::prevPage()
-{
-    if(pageIterator != pageVector.begin())
-    {
-        pageIterator--;
-        setPage();
-    }
-}
-
-void ComicReader::nextPage()
-{
-    if(pageIterator < pageVector.end()-1)
-    {
-        pageIterator++;
-        setPage();
-    }
-}
-
-void ComicReader::adjustScrollBar(QScrollBar *scrollBar, double factor)
-{
-    scrollBar->setValue(int(factor * scrollBar->value() + ((factor - 1) * scrollBar->pageStep()/2)));
-}
 
 

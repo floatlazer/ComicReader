@@ -28,7 +28,8 @@ SOURCES += \
         comicreader.cpp \
         page.cpp \
         pageloader.cpp \
-        decompress.cpp
+        decompress.cpp \
+    comicreaderActions.cpp
 
 HEADERS += \
         comicreader.h \
