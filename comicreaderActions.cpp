@@ -14,7 +14,7 @@ void ComicReader::createActions()
     controlMenu->addAction(openAct);
 
     // Previous page action
-    const QIcon prevIcon = QIcon::fromTheme("document-new", QIcon(":/icon/Left.png"));
+    const QIcon prevIcon = QIcon::fromTheme("document-new", QIcon(":/icon/left-arrow.png"));
     prevAct = new QAction(prevIcon, tr("&Previous page"), this);
     prevAct->setShortcuts(QKeySequence::MoveToPreviousChar);
     prevAct->setStatusTip(tr("Previous page"));
@@ -23,7 +23,7 @@ void ComicReader::createActions()
     ui->mainToolBar->addAction(prevAct);
 
     // Next page action
-    const QIcon nextIcon = QIcon::fromTheme("document-new", QIcon(":/icon/Right.png"));
+    const QIcon nextIcon = QIcon::fromTheme("document-new", QIcon(":/icon/right-arrow.png"));
     nextAct = new QAction(nextIcon, tr("&Next page"), this);
     nextAct->setShortcuts(QKeySequence::MoveToNextChar);
     nextAct->setStatusTip(tr("Next page"));
