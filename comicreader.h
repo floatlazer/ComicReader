@@ -46,7 +46,6 @@ private:
     void open();
     void prevPage();
     void nextPage();
-    void triggerSideLabel();
     void normalSize();
     void fitToWindow();
     void triggerDoublePage();
@@ -58,9 +57,7 @@ private:
     QPixmap currentPixmap;
     QLabel* centerLabel;
     QScrollArea* centerScrollArea;
-    QLabel* sideLabel;
     QComboBox pageComboBox; // comboBox to show page number
-    bool isShowSideLabel;
     double scaleFactor;
     int zoomCount; // 0 if not zoomed
 
@@ -70,7 +67,6 @@ private:
     QAction* nextAct;
     QAction* zoomInAct;
     QAction* zoomOutAct;
-    QAction* triggerAct;
     QAction* normalSizeAct;
     QAction* fitToWindowAct;
     QAction* doublePageAct;

@@ -18,9 +18,7 @@ ComicReader::ComicReader(QWidget *parent) :
     zoomCount = 0;
     isFirstPage = true;
     centerScrollArea = ui->centerScrollArea;
-    sideLabel = ui->sideLabel;
     centerLabel->setScaledContents(true);
-    sideLabel->setVisible(false);
     createActions();
     open();
     // Connect pageLoader thread
@@ -58,14 +56,6 @@ void ComicReader::createActions()
     openAct->setStatusTip(tr("Open"));
     connect(openAct, &QAction::triggered, this, &ComicReader::open);
     controlMenu->addAction(openAct);
-
-    // Trigger hide/show sideLabel action
-    /*const QIcon triggerIcon = QIcon::fromTheme("document-new", QIcon(":/icon/doubleArrow.png"));
-    triggerAct = new QAction(triggerIcon, tr("&Show/hide side label"), this);
-    triggerAct->setStatusTip(tr("Show/hide side label"));
-    connect(triggerAct, &QAction::triggered, this, &ComicReader::triggerSideLabel);
-    viewMenu->addAction(triggerAct);
-    ui->mainToolBar->addAction(triggerAct);*/
 
     // Previous page action
     const QIcon prevIcon = QIcon::fromTheme("document-new", QIcon(":/icon/leftArrow.png"));
@@ -274,13 +264,6 @@ void ComicReader::loadPages()
     while(pageVector.empty()); // Wait to load the first element
     pageIterator=pageVector.begin();
 
-}
-
-// Trigger show/hide center label and side label
-void ComicReader::triggerSideLabel()
-{
-    isShowSideLabel = !isShowSideLabel;
-    sideLabel->setVisible(isShowSideLabel);
 }
 
 void ComicReader::open()
