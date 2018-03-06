@@ -1,8 +1,9 @@
 #ifndef LOADPAGETHREAD_H
 #define LOADPAGETHREAD_H
-#include "page.h"
 #include <QComboBox>
 #include <QVector>
+#include "page.h"
+#include "decompress.h"
 
 // Object run in another thread to load images asynchronously
 class PageLoader : public QObject
@@ -17,6 +18,7 @@ public slots:
 private:
     QVector<Page>* pageVector;
     QComboBox* pageComboBox;
+    Decompress decom;
 };
 
 #endif // LOADPAGETHREAD_H

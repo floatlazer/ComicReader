@@ -19,7 +19,7 @@ ComicReader::ComicReader(QWidget *parent) :
     isFirstPage = true;
     centerScrollArea = ui->centerScrollArea;
     sideLabel = ui->sideLabel;
-    centerLabel->setScaledContents(false);
+    centerLabel->setScaledContents(true);
     sideLabel->setVisible(false);
     createActions();
     // Connect pageLoader thread
@@ -28,6 +28,8 @@ ComicReader::ComicReader(QWidget *parent) :
     pageLoader.moveToThread(&loadPagesThread);
     connect(this, &ComicReader::startLoadPages, &pageLoader, &PageLoader::doLoadPages);
     loadPagesThread.start();
+    open();
+    if(filePath.isEmpty() || filePath == NULL); // Quit application
     loadPages();
     fitToWindowAct->setChecked(true);
     normalSizeAct->setEnabled(true);
@@ -267,11 +269,12 @@ QSize ComicReader::sizeHint() const
 // Load image and add to pageVector asynchronously
 void ComicReader::loadPages()
 {
-    QString path1 = "/Users/zhangxuan/Desktop/comicExample_big";
-    QString path2 = "/Users/zhangxuan/Desktop/comicExample_normal";
-    emit startLoadPages(path1);
+    //QString path1 = "/Users/zhangxuan/Desktop/comicExample_big";
+    //QString path2 = "/Users/zhangxuan/Desktop/comicExample_normal";
+    emit startLoadPages(filePath);
     while(pageVector.empty()); // Wait to load the first element
-    pageIterator = pageVector.begin();
+    pageIterator=pageVector.begin();
+
 }
 
 // Trigger show/hide center label and side label
@@ -283,12 +286,17 @@ void ComicReader::triggerSideLabel()
 
 void ComicReader::open()
 {
+    //clear old comicbook before open new one
+    if(!pageVector.isEmpty() || !ImageVector.isEmpty())
+    {
+        pageVector.clear();
+        ImageVector.clear();
+    }
     // Select a png, jpg, cbr or cbz
     qDebug()<<"open"<<QStandardPaths::writableLocation(QStandardPaths::HomeLocation);
-    fileName = QFileDialog::getOpenFileName(this, tr("Open Image"),
+    filePath = QFileDialog::getOpenFileName(this, tr("Open Image"),
                QStandardPaths::writableLocation(QStandardPaths::HomeLocation),
-               tr("Image Files (*.png *.jpg *.cbr *.cbz)"));
-    qDebug()<<"Filename"<<fileName;
+               tr("Image Files (*.png *.jpg *.cbr *.cbz *.rar *.zip *.tar)"));
 }
 
 void ComicReader::prevPage()

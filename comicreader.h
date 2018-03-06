@@ -54,6 +54,7 @@ private:
     bool isFirstPage;
 
     QVector<Page>::Iterator pageIterator;
+    QVector<QImage> ImageVector; //the vector of saving image data
     QPixmap currentPixmap;
     QLabel* centerLabel;
     QScrollArea* centerScrollArea;
@@ -62,6 +63,7 @@ private:
     bool isShowSideLabel;
     double scaleFactor;
     int zoomCount; // 0 if not zoomed
+
     // QAction
     QAction* openAct;
     QAction* prevAct;
@@ -72,7 +74,8 @@ private:
     QAction* normalSizeAct;
     QAction* fitToWindowAct;
     QAction* doublePageAct;
-    QString fileName;
+
+    QString filePath;
 
     QThread loadPagesThread;
     PageLoader pageLoader;
