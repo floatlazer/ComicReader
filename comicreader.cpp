@@ -29,7 +29,6 @@ ComicReader::ComicReader(QWidget *parent) :
     connect(this, &ComicReader::startLoadPages, &pageLoader, &PageLoader::doLoadPages);
     loadPagesThread.start();
     open();
-    if(filePath.isEmpty() || filePath == NULL); // Quit application
     loadPages();
     fitToWindowAct->setChecked(true);
     normalSizeAct->setEnabled(true);
@@ -297,6 +296,10 @@ void ComicReader::open()
     filePath = QFileDialog::getOpenFileName(this, tr("Open Image"),
                QStandardPaths::writableLocation(QStandardPaths::HomeLocation),
                tr("Image Files (*.png *.jpg *.cbr *.cbz *.rar *.zip *.tar)"));
+    if(filePath.isEmpty() || filePath == NULL) // Quit application
+    {
+        qDebug()<<"cancel";
+    }
 }
 
 void ComicReader::prevPage()

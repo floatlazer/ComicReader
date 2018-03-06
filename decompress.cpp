@@ -12,7 +12,7 @@ void Decompress::decFiles()
 {
     indicator=0;
     streaming=ar_open_file(path);
-    listing = ar_open_zip_archive(streaming,true); //set second parameter false for extracting file non-deflate
+    listing = ar_open_zip_archive(streaming, true); //set second parameter false for extracting file non-deflate
     if (listing==NULL)
         indicator=1;
     if (!listing)
