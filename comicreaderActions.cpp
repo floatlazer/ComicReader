@@ -14,7 +14,7 @@ void ComicReader::createActions()
     controlMenu->addAction(openAct);
 
     // Previous page action
-    const QIcon prevIcon = QIcon::fromTheme("document-new", QIcon(":/icon/leftArrow.png"));
+    const QIcon prevIcon = QIcon::fromTheme("document-new", QIcon(":/icon/Left.png"));
     prevAct = new QAction(prevIcon, tr("&Previous page"), this);
     prevAct->setShortcuts(QKeySequence::MoveToPreviousChar);
     prevAct->setStatusTip(tr("Previous page"));
@@ -23,7 +23,7 @@ void ComicReader::createActions()
     ui->mainToolBar->addAction(prevAct);
 
     // Next page action
-    const QIcon nextIcon = QIcon::fromTheme("document-new", QIcon(":/icon/rightArrow.png"));
+    const QIcon nextIcon = QIcon::fromTheme("document-new", QIcon(":/icon/Right.png"));
     nextAct = new QAction(nextIcon, tr("&Next page"), this);
     nextAct->setShortcuts(QKeySequence::MoveToNextChar);
     nextAct->setStatusTip(tr("Next page"));
@@ -32,7 +32,7 @@ void ComicReader::createActions()
     ui->mainToolBar->addAction(nextAct);
 
     // ZoomIn action
-    const QIcon zoomInIcon = QIcon::fromTheme("document-new", QIcon(":/icon/zoomIn.png"));
+    const QIcon zoomInIcon = QIcon::fromTheme("document-new", QIcon(":/icon/ZoomIn.png"));
     zoomInAct = new QAction(zoomInIcon, tr("&Zoom in"), this);
     zoomInAct->setShortcuts(QKeySequence::ZoomIn);
     zoomInAct->setStatusTip(tr("Zoom In"));
@@ -41,7 +41,7 @@ void ComicReader::createActions()
     ui->mainToolBar->addAction(zoomInAct);
 
     // ZoomOut action
-    const QIcon zoomOutIcon = QIcon::fromTheme("document-new", QIcon(":/icon/zoomOut.png"));
+    const QIcon zoomOutIcon = QIcon::fromTheme("document-new", QIcon(":/icon/ZoomOut.png"));
     zoomOutAct = new QAction(zoomOutIcon, tr("&Zoom out"), this);
     zoomOutAct->setShortcuts(QKeySequence::ZoomOut);
     zoomOutAct->setStatusTip(tr("Zoom Out"));
@@ -56,9 +56,14 @@ void ComicReader::createActions()
     viewMenu->addSeparator();
 
     // FitToWindow action
-    fitToWindowAct = viewMenu->addAction(tr("&Fit to Window"), this, &ComicReader::fitToWindow);
-    fitToWindowAct->setCheckable(true);
+    const QIcon fitToWindowIcon = QIcon::fromTheme("Document-new",QIcon(":/icon/Expand.png"));
+    fitToWindowAct = new QAction(fitToWindowIcon, tr("&Fit to Window"), this);
     fitToWindowAct->setShortcut(tr("Ctrl+F"));
+    fitToWindowAct->setStatusTip(tr("Fit to Window"));
+    connect(fitToWindowAct,&QAction::triggered,this,&ComicReader::fitToWindow);
+    viewMenu->addAction(fitToWindowAct);
+    ui->mainToolBar->addAction(fitToWindowAct);
+    fitToWindowAct->setCheckable(true);
 
     // DoublePageMode action
     doublePageAct = viewMenu->addAction(tr("&Double page mode"), this, &ComicReader::triggerDoublePage);
@@ -71,7 +76,7 @@ void ComicReader::createActions()
     zoomInAct->setEnabled(false);
     zoomOutAct->setEnabled(false);
     fitToWindowAct->setEnabled(false);
-    fitToWindowAct->setChecked(false);
+    fitToWindowAct->setChecked(true);
     doublePageAct->setEnabled(false);
     doublePageAct->setChecked(false);
 }
@@ -79,7 +84,7 @@ void ComicReader::createActions()
 // Note that use check will take effect after actions
 void ComicReader::updateActions()
 {
-    if(normalSizeAct->isEnabled())
+    if(zoomCount!=0||normalIndicator!=0)
     {
         normalSizeAct->setEnabled(false);
         fitToWindowAct->setEnabled(true);

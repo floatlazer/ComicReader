@@ -170,6 +170,7 @@ void ComicReader::zoomIn()
     double factor = 1.25;
     scaleImage(factor);
     zoomCount++;
+    updateActions();
 }
 
 void ComicReader::zoomOut()
@@ -177,6 +178,7 @@ void ComicReader::zoomOut()
     double factor = 0.8;
     scaleImage(factor);
     zoomCount--;
+    updateActions();
 }
 
 // Scale image, multiply the current scaleFactor by factor. Every image scaling function should use this method.
@@ -204,6 +206,7 @@ void ComicReader::normalSize()
     qDebug()<<"normalSize";
     //centerLabel->adjustSize();
     scaleImage(1/scaleFactor);
+    normalIndicator=1;
     updateActions();
 }
 
@@ -212,6 +215,7 @@ void ComicReader::fitToWindow()
     qDebug()<<"fitToWindow";
     scaleImageToWindow();
     zoomCount = 0;
+    normalIndicator=0;
     updateActions();
 }
 

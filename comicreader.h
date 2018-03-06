@@ -59,6 +59,7 @@ private:
     QComboBox pageComboBox; // comboBox to show page number
     double scaleFactor;
     int zoomCount; // 0 if not zoomed
+    int normalIndicator; // 0 if fit to window
 
     // QAction
     QAction* openAct;
