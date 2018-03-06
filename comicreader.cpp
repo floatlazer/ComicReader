@@ -16,7 +16,6 @@ ComicReader::ComicReader(QWidget *parent) :
     connect(&pageComboBox, QOverload<int>::of(&QComboBox::activated),[=](int index){qDebug()<<"page index change"; pageIterator = pageVector.begin() + index; setPage(); });
     centerLabel = ui->centerLabel;
     centerScrollArea = ui->centerScrollArea;
-    centerLabel->setScaledContents(true);
     // Init params
     scaleFactor = 1.0;
     isFirstPage = true;
