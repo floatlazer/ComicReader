@@ -19,12 +19,9 @@ ComicReader::ComicReader(QWidget *parent) :
     centerLabel->setScaledContents(true);
     // Init params
     scaleFactor = 1.0;
-    zoomCount = 0;
     isFirstPage = true;
     // Create Actions
     createActions();
-    fitToWindowAct->setChecked(true);
-    normalSizeAct->setEnabled(true);
     doublePageAct->setEnabled(true);
 
     // Connect pageLoader thread
@@ -114,7 +111,7 @@ void ComicReader::setPage()
         painter->~QPainter(); // destroy painter
     }
 
-    if(fitToWindowAct->isChecked() && zoomCount == 0 && ! isFirstPage) // fitToWindow and not zoomed, keep fit to window
+    if(fitToWindowAct->isChecked() && ! isFirstPage) // fitToWindow and not zoomed, keep fit to window
     {
         scaleImageToWindow();
     }
@@ -169,7 +166,6 @@ void ComicReader::zoomIn()
 {
     double factor = 1.25;
     scaleImage(factor);
-    zoomCount++;
     updateActions();
 }
 
@@ -177,7 +173,6 @@ void ComicReader::zoomOut()
 {
     double factor = 0.8;
     scaleImage(factor);
-    zoomCount--;
     updateActions();
 }
 
@@ -206,7 +201,6 @@ void ComicReader::normalSize()
     qDebug()<<"normalSize";
     //centerLabel->adjustSize();
     scaleImage(1/scaleFactor);
-    normalIndicator=1;
     updateActions();
 }
 
@@ -214,8 +208,6 @@ void ComicReader::fitToWindow()
 {
     qDebug()<<"fitToWindow";
     scaleImageToWindow();
-    zoomCount = 0;
-    normalIndicator=0;
     updateActions();
 }
 
@@ -240,11 +232,12 @@ void ComicReader::scaleImageToWindow()
 // Resize image when resize the window
 void ComicReader::resizeEvent(QResizeEvent *event)
 {
-    if(fitToWindowAct->isChecked() && zoomCount == 0)
+    if(fitToWindowAct->isChecked())
     {
         qDebug()<<"resizeEvent"<<"mainWindow"<<size();
         scaleImageToWindow();
     }
+    updateActions();
 }
 
 QSize ComicReader::sizeHint() const

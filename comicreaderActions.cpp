@@ -72,7 +72,7 @@ void ComicReader::createActions()
 
     // Set default status
     normalSizeAct->setEnabled(false);
-    normalSizeAct->setChecked(false);
+    normalSizeAct->setChecked(true);
     zoomInAct->setEnabled(false);
     zoomOutAct->setEnabled(false);
     fitToWindowAct->setEnabled(false);
@@ -84,7 +84,7 @@ void ComicReader::createActions()
 // Note that use check will take effect after actions
 void ComicReader::updateActions()
 {
-    if(zoomCount!=0||normalIndicator!=0)
+   /* if(zoomCount!=0||normalIndicator!=0)
     {
         normalSizeAct->setEnabled(false);
         fitToWindowAct->setEnabled(true);
@@ -95,5 +95,25 @@ void ComicReader::updateActions()
         fitToWindowAct->setEnabled(false);
         normalSizeAct->setEnabled(true);
         normalSizeAct->setChecked(false);
+    }*/
+    if(pageIterator->getImage().size() == centerLabel->pixmap()->size())
+    {
+        normalSizeAct->setEnabled(false);
+        normalSizeAct->setChecked(true);
+    }
+    else
+    {
+        normalSizeAct->setEnabled(true);
+        normalSizeAct->setChecked(false);
+    }
+    if(size().width()==sizeHint().width() || size().height() == sizeHint().height())
+    {
+        fitToWindowAct->setEnabled(false);
+        fitToWindowAct->setChecked(true);
+    }
+    else
+    {
+        fitToWindowAct->setEnabled(true);
+        fitToWindowAct->setChecked(false);
     }
 }
