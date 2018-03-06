@@ -19,6 +19,8 @@ private:
     QVector<Page>* pageVector;
     QComboBox* pageComboBox;
     Decompress decom;
+    QVector<QString> nameList;
+    int totalPages;
 };
 
 #endif // LOADPAGETHREAD_H

@@ -20,9 +20,9 @@ public:
     Decompress();
     ~Decompress();
     // Open archive file and decompress
-    void decFiles();
+    void decFiles(QVector<QString>& nameList, int& totalPages);
     // Get file from decompress archive
-    void getFiles(bool parse);
+    void getFiles(const char* filename);
     // Get file number in the archive
     int getEntryNumber();
     size_t getEntrySize();
@@ -38,7 +38,6 @@ private:
     const char *path;
     const char *entryName;
     size_t entrySize;
-    int entryNumber;
 };
 
 #endif // DECOMPRESS_H

@@ -12,13 +12,6 @@ Page::Page(QImage _image, unsigned int number)
     pageNumber = number;
 }
 
-/*Page::Page(Page& _page)
-{
-    pageNumber = _page.pageNumber;
-    loaded = _page.isLoaded();
-    image = _page.getImage();
-}*/
-
 Page::Page(unsigned int number)
 {
     initParams();

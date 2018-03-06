@@ -4,11 +4,10 @@ Decompress::Decompress()
 {
     streaming=NULL;
     listing=NULL;
-    entryNumber = 0;
 }
 
 //open a file and open archive
-void Decompress::decFiles()
+void Decompress::decFiles(QVector<QString>& nameList, int& entryCount)
 {
     indicator=0;
     streaming=ar_open_file(path);
@@ -27,11 +26,11 @@ void Decompress::decFiles()
         if (indicator==1)
             next=ar_parse_entry(listing);
         next=ar_parse_entry(listing);
-
+        nameList.push_back(QString(ar_entry_get_name(listing)));
         count+=1;
     }
     count-=1;
-    entryNumber = count;
+    entryCount = count;
     // Return to first entry
     ar_parse_entry_at(listing, 0);
 }
@@ -42,21 +41,9 @@ Decompress::~Decompress()
     ar_close(streaming);
 }
 
-int Decompress::getEntryNumber()
+void Decompress::getFiles(const char* filename)
 {
-    return entryNumber;
-}
-
-void Decompress::getFiles(bool parse)
-{
-    if(parse)
-    {
-        if (indicator==1)
-        {
-            ar_parse_entry(listing);
-        }
-        ar_parse_entry(listing);
-    }
+    ar_parse_entry_for(listing, filename);
     entryName=ar_entry_get_name(listing);
     entrySize = ar_entry_get_size(listing);
     ar_entry_uncompress(listing, buffer, entrySize);
