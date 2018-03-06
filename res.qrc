@@ -11,5 +11,7 @@
         <file>Right.png</file>
         <file>ZoomIn.png</file>
         <file>ZoomOut.png</file>
+        <file>left-arrow.png</file>
+        <file>right-arrow.png</file>
     </qresource>
 </RCC>
