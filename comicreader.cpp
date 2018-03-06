@@ -22,13 +22,13 @@ ComicReader::ComicReader(QWidget *parent) :
     centerLabel->setScaledContents(true);
     sideLabel->setVisible(false);
     createActions();
+    open();
     // Connect pageLoader thread
     pageLoader.setPageVector(&pageVector);
     pageLoader.setPageComboBox(&pageComboBox);
     pageLoader.moveToThread(&loadPagesThread);
     connect(this, &ComicReader::startLoadPages, &pageLoader, &PageLoader::doLoadPages);
     loadPagesThread.start();
-    open();
     loadPages();
     fitToWindowAct->setChecked(true);
     normalSizeAct->setEnabled(true);
@@ -299,6 +299,7 @@ void ComicReader::open()
     if(filePath.isEmpty() || filePath == NULL) // Quit application
     {
         qDebug()<<"cancel";
+        exit(0);
     }
 }
 
