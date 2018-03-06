@@ -84,18 +84,6 @@ void ComicReader::createActions()
 // Note that use check will take effect after actions
 void ComicReader::updateActions()
 {
-   /* if(zoomCount!=0||normalIndicator!=0)
-    {
-        normalSizeAct->setEnabled(false);
-        fitToWindowAct->setEnabled(true);
-        fitToWindowAct->setChecked(false);
-    }
-    else
-    {
-        fitToWindowAct->setEnabled(false);
-        normalSizeAct->setEnabled(true);
-        normalSizeAct->setChecked(false);
-    }*/
     if(pageIterator->getImage().size() == centerLabel->pixmap()->size())
     {
         normalSizeAct->setEnabled(false);
