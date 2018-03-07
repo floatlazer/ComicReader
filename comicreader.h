@@ -25,7 +25,8 @@ public:
     QVector<Page> pageVector; // The vector of loaded pages
 
 signals:
-    void startLoadPages(const QString& path); // signal to start loading pages
+    void preparePages(const QString& path); // signal to start loading pages without images
+    void loadImages(int pageNumber); // signal to load images for this page and its neighbour pages
 
 public slots:
     void loadPages();

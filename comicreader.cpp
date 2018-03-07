@@ -27,7 +27,8 @@ ComicReader::ComicReader(QWidget *parent) :
     pageLoader.setPageVector(&pageVector);
     pageLoader.setPageComboBox(&pageComboBox);
     pageLoader.moveToThread(&loadPagesThread);
-    connect(this, &ComicReader::startLoadPages, &pageLoader, &PageLoader::doLoadPages);
+    connect(this, &ComicReader::preparePages, &pageLoader, &PageLoader::prepare);
+    connect(this, &ComicReader::loadImages, &pageLoader, &PageLoader::loadImages);
     loadPagesThread.start();
     // Open archive
     open();
@@ -65,7 +66,7 @@ void ComicReader::open()
         qDebug()<<"cancel";
         exit(0);
     }
-    // Load pages
+    // Load pages without loading images
     loadPages();
     // Show page
     setPage();
@@ -73,11 +74,11 @@ void ComicReader::open()
     adjustSize(); // Adjust window size to the first image
 }
 
-// Load image and add to pageVector asynchronously
+// Load pages without loading images
 void ComicReader::loadPages()
 {
     qDebug()<<"Load Pages";
-    emit startLoadPages(filePath);
+    emit preparePages(filePath);
     while(pageVector.empty()); // Wait to load the first element
     pageIterator=pageVector.begin();
 }
@@ -85,6 +86,8 @@ void ComicReader::loadPages()
 void ComicReader::setPage()
 {
     qDebug()<<"setPage"<<"FitToWindow"<<fitToWindowAct->isChecked()<<"DoublePageMode"<<doublePageAct->isChecked();
+    // Load images for this page and its neighbour pages
+    emit loadImages(pageIterator - pageVector.begin() +1);
     // Enable actions
     zoomInAct->setEnabled(true);
     zoomOutAct->setEnabled(true);

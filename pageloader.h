@@ -14,12 +14,15 @@ public:
     void setPageVector(QVector<Page>* _pageVector);
     void setPageComboBox(QComboBox* _pageComboBox);
 public slots:
-    void doLoadPages(const QString &path);
+    void prepare(const QString path); // Load pages without read images
+    void loadImages(int pageNumber); // Load images for this page and its neighbour pages
 private:
+    void loadPage(int pageNumber); // Load one page
     QVector<Page>* pageVector;
     QComboBox* pageComboBox;
     Decompress decom;
     QVector<QString> nameList;
+    QVector<int> pageLoaded; // Pages whose image is loaded
     int totalPages;
 };
 
