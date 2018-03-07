@@ -127,7 +127,7 @@ void ComicReader::setPage()
 
 void ComicReader::prevPage()
 {
-    if(!doublePageAct->isChecked())
+    if(!doublePageAct->isChecked() || pageIterator == pageVector.begin()+1)
     {
         if(pageIterator != pageVector.begin())
         {
@@ -137,7 +137,7 @@ void ComicReader::prevPage()
     }
     else
     {
-        if(pageIterator >= pageVector.begin()+1)
+        if(pageIterator >= pageVector.begin()+2)
         {
             pageIterator-=2;
             setPage();
@@ -216,14 +216,6 @@ void ComicReader::fitToWindow()
 void ComicReader::triggerDoublePage()
 {
     qDebug()<<"triggerDoublePage";
-    if(doublePageAct->isChecked() && ((pageIterator-pageVector.begin()) % 2) != 0)     // Move pageIterator is current page is a even number
-    {
-        pageIterator --;
-    }
-    if(!doublePageAct->isChecked() && ((pageIterator-pageVector.begin()) % 2) == 0 && pageIterator < pageVector.end() - 1)
-    {
-        pageIterator ++;
-    }
     setPage();
 }
 
