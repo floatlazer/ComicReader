@@ -15,6 +15,7 @@ void PageLoader::prepare(const QString path)
     pageVector->resize(totalPages);
     for(auto i = pageVector->begin(); i < pageVector->end(); i++)
     {
+        i->setPageNumber(i - pageVector->begin() + 1);
         pageComboBox->addItem(QString("%1 / %2").arg(i-pageVector->begin()+1).arg(totalPages));
     }
 }
