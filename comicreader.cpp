@@ -231,6 +231,8 @@ void ComicReader::scaleImageToWindow()
     double factorHeight = double(centerLabel->pixmap()->height())/double(currentPixmap.height());
     scaleFactor = factorWidth < factorHeight ? factorWidth : factorHeight;
     qDebug()<<"scaleImageToWindow"<<scaleFactor;
+    zoomInAct->setEnabled(scaleFactor < 3.0);
+    zoomOutAct->setEnabled(scaleFactor > 0.333);
 }
 
 // Resize image when resize the window

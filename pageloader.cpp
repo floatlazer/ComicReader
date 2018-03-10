@@ -2,8 +2,7 @@
 #include <QDebug>
 #include <QCoreApplication>
 PageLoader::PageLoader()
-{
-}
+{}
 
 void PageLoader::prepare(const QString path)
 {
@@ -26,7 +25,8 @@ void PageLoader::loadImages(int pageNumber)
     qDebug()<<"loadImages";
     // Load images [pageNumber - 9, pageNumber + 10]
     int loadOrder[20] = {0, 1, -1, 2, -2, 3, -3, 4, -4, 5, -5, 6, -6, 7, -7, 8, -8, 9, -9, 10};
-    for(int i = 0; i < 10; i++)
+
+    for(int i = 0; i < 20; i++)
     {
         int p = pageNumber + loadOrder[i]; // page to be loaded
         if(p >=1 && p <= totalPages)
