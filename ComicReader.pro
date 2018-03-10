@@ -43,15 +43,11 @@ FORMS += \
 RESOURCES += \
     res.qrc
 
-win32:CONFIG(release, debug|release): LIBS += -L$$PWD/./release/ -lunarr
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/./debug/ -lunarr
-else:unix: LIBS += -L$$PWD/./ -lunarr
 
-INCLUDEPATH += $$PWD/.
-DEPENDPATH += $$PWD/.
+unix|win32: LIBS += -L$$PWD/unarr/build/release/ -lunarr
 
-win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/./release/libunarr.a
-else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/./debug/libunarr.a
-else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/./release/unarr.lib
-else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/./debug/unarr.lib
-else:unix: PRE_TARGETDEPS += $$PWD/./libunarr.a
+INCLUDEPATH += $$PWD/unarr
+DEPENDPATH += $$PWD/unarr
+
+win32:!win32-g++: PRE_TARGETDEPS += $$PWD/unarr/build/release/unarr.lib
+else:unix|win32-g++: PRE_TARGETDEPS += $$PWD/unarr/build/release/libunarr.a

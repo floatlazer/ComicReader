@@ -79,7 +79,8 @@ void ComicReader::loadPages()
 {
     qDebug()<<"Load Pages";
     emit preparePages(filePath);
-    while(pageVector.empty()); // Wait to load the first element
+    while(pageVector.empty()) QThread::msleep(10); // Wait to load the first element
+    qDebug()<<"ok";
     pageIterator=pageVector.begin();
 }
 
@@ -111,6 +112,7 @@ void ComicReader::setPage()
         painter->drawPixmap(0, 0, width1, HEIGHT, QPixmap::fromImage(pageIterator->getImage()));
         painter->drawPixmap(width1 + pageMargin, 0, width2, HEIGHT, QPixmap::fromImage((pageIterator+1)->getImage()));
         painter->~QPainter(); // destroy painter
+        delete pixmap; // destroy local pointer
     }
 
     if(fitToWindowAct->isChecked() && ! isFirstPage) // fitToWindow and not zoomed, keep fit to window

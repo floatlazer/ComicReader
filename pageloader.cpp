@@ -1,8 +1,9 @@
 #include "pageloader.h"
 #include <QDebug>
-
+#include <QCoreApplication>
 PageLoader::PageLoader()
-{}
+{
+}
 
 void PageLoader::prepare(const QString path)
 {
@@ -23,9 +24,9 @@ void PageLoader::prepare(const QString path)
 void PageLoader::loadImages(int pageNumber)
 {
     qDebug()<<"loadImages";
-    // Load images [pageNumber - 2, pageNumber + 3]
-    int loadOrder[6] = {0, 1, -1, 2, -2, 3};
-    for(int i = 0; i < 6; i++)
+    // Load images [pageNumber - 9, pageNumber + 10]
+    int loadOrder[20] = {0, 1, -1, 2, -2, 3, -3, 4, -4, 5, -5, 6, -6, 7, -7, 8, -8, 9, -9, 10};
+    for(int i = 0; i < 10; i++)
     {
         int p = pageNumber + loadOrder[i]; // page to be loaded
         if(p >=1 && p <= totalPages)
@@ -34,12 +35,12 @@ void PageLoader::loadImages(int pageNumber)
         }
     }
 
-    // Clean images loaded that are not in [pageNumber - 2, pageNumber + 3]
+    // Clean images loaded that are not in [pageNumber - 4, pageNumber + 5]
     for(int i = 0; i < pageLoaded.size(); i++)
     {
         int p = pageLoaded[i];
         QImage dockImage;
-        if(p < pageNumber-2 || p > pageNumber + 3)
+        if(p < pageNumber-9 || p > pageNumber + 10)
         {
             pageVector->operator [](p-1).setLoaded(false);
             pageVector->operator [](p-1).setImage(dockImage); // Redirect image pointer to release image memory
