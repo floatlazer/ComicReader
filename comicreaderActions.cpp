@@ -88,7 +88,7 @@ void ComicReader::createActions()
 // Note that use check will take effect after actions
 void ComicReader::updateActions()
 {
-    if(pageIterator->getImage().size() == centerLabel->pixmap()->size())
+    if(currentPixmap.size() == centerLabel->pixmap()->size())
     {
         normalSizeAct->setEnabled(false);
         normalSizeAct->setChecked(true);

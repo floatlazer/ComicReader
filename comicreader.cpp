@@ -219,6 +219,7 @@ void ComicReader::triggerDoublePage()
 {
     qDebug()<<"triggerDoublePage";
     setPage();
+    updateActions();
 }
 
 void ComicReader::scaleImageToWindow()
