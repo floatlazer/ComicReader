@@ -70,6 +70,10 @@ void ComicReader::createActions()
     doublePageAct->setCheckable(true);
     doublePageAct->setShortcut(tr("Ctrl+D"));
 
+    // About
+    QMenu * about = menuBar()->addMenu(tr("&About"));
+    about->addAction(tr("&Comic book reader developped by Xuan Zhang and Zhufeng Li"));
+
     // Set default status
     normalSizeAct->setEnabled(false);
     normalSizeAct->setChecked(true);
