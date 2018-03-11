@@ -40,7 +40,7 @@ unsigned int Page::getPageNumber(){return pageNumber;}
 
 bool Page::isLoaded(){return loaded;}
 
-int Page::getSacled(){return scalefactor;}
+double Page::getScaled(){return scalefactor;}
 
 
 // Setter
@@ -53,5 +53,5 @@ void Page::setPageNumber(unsigned int number){pageNumber = number;}
 
 void Page::setLoaded(bool _loaded){loaded = _loaded;}
 
-void Page::setScaled(int factor){scalefactor=factor;}
+void Page::setScaled(double factor){scalefactor=factor;}
 

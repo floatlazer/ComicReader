@@ -17,17 +17,17 @@ public:
     QImage getImage();
     unsigned int getPageNumber();
     bool isLoaded();
-    int getSacled();
+    double getScaled();
     // Setter
     void setPixmap(QPixmap _Pixmap);
     void setImage(QImage _image);
     void setPageNumber(unsigned int number);
     void setLoaded(bool _loaded);
-    void setScaled(int factor);
+    void setScaled(double factor);
 private:
     QImage image;
     QPixmap pixmap;
-    int scalefactor;
+    double scalefactor;
     unsigned int pageNumber;
     void initParams();
     bool loaded; // Whether the page has been loaded

@@ -19,6 +19,7 @@ public:
 
 private:
     QVector<Page>* pageVector;
+    QPixmap dockPixmap;
 };
 
 #endif // IMAGEPROCESS_H

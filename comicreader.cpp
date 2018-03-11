@@ -36,7 +36,7 @@ ComicReader::ComicReader(QWidget *parent) :
     imageProcess.moveToThread(&imageProcessThread);
     connect(this,&ComicReader::imageToFactor,&imageProcess,&ImageProcess::scaleImageToFactor);
     connect(this,&ComicReader::imageToWindow,&imageProcess,&ImageProcess::scaleImageToWindow);
-    loadPagesThread.start();
+    imageProcessThread.start();
 
     // Open archive
     open();
@@ -198,7 +198,7 @@ void ComicReader::scaleImage(double factor)
     scaleFactor *= factor;
     qDebug()<<"scaleImage"<<scaleFactor;
     emit imageToFactor(scaleFactor,pageNumber);
-    //while(pageIterator->getSacled()!=scaleFactor) ;
+    while(pageIterator->getScaled()!=scaleFactor) {QThread::msleep(10);qDebug()<<"wait for scaling";} ;
     centerLabel->setPixmap(pageIterator->getPixmap());
     centerLabel->adjustSize();
     ui->scrollAreaWidgetContents->adjustSize();

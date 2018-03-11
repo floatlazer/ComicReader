@@ -33,6 +33,7 @@ signals:
 
 public slots:
     void loadPages();
+    void scaleImage(double factor);
 
 private:
     Ui::ComicReader *ui;
@@ -43,7 +44,6 @@ private:
     void setPage();
     void zoomIn();
     void zoomOut();
-    void scaleImage(double factor);
     void adjustScrollBar(QScrollBar *scrollBar, double factor);
     void freePageVector();
     // Control
