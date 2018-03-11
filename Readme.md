@@ -33,7 +33,7 @@ We use [unarr](https://github.com/zeniko/unarr) library to uncompress archive be
 
 * Qt 5.10
 * Qt creator 4.5.0
-* A C compiler (clang, gcc, etc,  to compile *unarr* library ) 
+* A C compiler (clang, gcc, etc,  to compile *unarr* library )
 * GNU Make (To build *unarr* library)
 
 ## Build
@@ -78,9 +78,9 @@ We store pages (images) in a [QVector](http://doc.qt.io/qt-5/qvector.html)<Page>
 
 Every time the user choose a new page, page loading will load current page, 9 pages before current page and 10 pages after current pages to prepare pages before user moves to neighbor pages
 
-####Communication between threads
+#### Communication between threads
 
-Qt use [signals and slots](http://doc.qt.io/archives/qt-4.8/signalsandslots.html) to communicate between threads. 
+Qt use [signals and slots](http://doc.qt.io/archives/qt-4.8/signalsandslots.html) to communicate between threads.
 
 After user choosing a archive via open, ```ComicReader``` will send a *preparePages* signal which contains the path of the archive. This signal is connected to the slot *prepare* in ```PageLoader``` which is a function to initialize page vector. 
 
@@ -100,7 +100,7 @@ The same, when user navigates to a certain page, ```ComicReader``` will send a *
 
 #### Memory management
 
-As a comic book may have many pages, we don't want to load them all in memory. 
+As a comic book may have many pages, we don't want to load them all in memory.
 
 ```PageLoader``` class maintains a vector to keep track of for which pages images have been loaded. Every time a new page is requested, page loading thread will first load all images in range [currentPage-9, currentPage+10] and then release all other images. This can considerably constrain the memory using when the archive is of large size.
 
@@ -111,4 +111,3 @@ QImage dockImage;
 ...
 pageVector->operator [](p-1).setImage(dockImage); // Redirect image pointer to release image memory
 ```
-
