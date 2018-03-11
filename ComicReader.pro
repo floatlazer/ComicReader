@@ -29,13 +29,15 @@ SOURCES += \
         page.cpp \
         pageloader.cpp \
         decompress.cpp \
-    comicreaderActions.cpp
+    comicreaderActions.cpp \
+    imageprocess.cpp
 
 HEADERS += \
         comicreader.h \
         page.h \
         pageloader.h \
-        decompress.h
+        decompress.h \
+    imageprocess.h
 
 FORMS += \
         comicreader.ui

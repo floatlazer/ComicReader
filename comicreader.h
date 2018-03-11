@@ -10,6 +10,7 @@
 #include <QThread>
 #include "page.h"
 #include "pageloader.h"
+#include "imageprocess.h"
 
 namespace Ui {
 class ComicReader;
@@ -27,6 +28,8 @@ public:
 signals:
     void preparePages(const QString& path); // signal to start loading pages without images
     void loadImages(int pageNumber); // signal to load images for this page and its neighbour pages
+    void imageToFactor(double scaleFactor, int pageNumber);
+    void imageToWindow(QSize size, int pageNumber);
 
 public slots:
     void loadPages();
@@ -59,6 +62,7 @@ private:
     QScrollArea* centerScrollArea;
     QComboBox pageComboBox; // comboBox to show page number
     double scaleFactor;
+    int pageNumber;
 
     // QAction
     QAction* openAct;
@@ -74,6 +78,8 @@ private:
 
     QThread loadPagesThread;
     PageLoader pageLoader;
+    QThread imageProcessThread;
+    ImageProcess imageProcess;
 protected:
     virtual void resizeEvent(QResizeEvent *event);
     virtual QSize sizeHint() const;

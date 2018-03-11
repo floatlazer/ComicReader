@@ -30,6 +30,14 @@ ComicReader::ComicReader(QWidget *parent) :
     connect(this, &ComicReader::preparePages, &pageLoader, &PageLoader::prepare);
     connect(this, &ComicReader::loadImages, &pageLoader, &PageLoader::loadImages);
     loadPagesThread.start();
+
+    // Imageprocess thread
+    imageProcess.setPageVector(&pageVector);
+    imageProcess.moveToThread(&imageProcessThread);
+    connect(this,&ComicReader::imageToFactor,&imageProcess,&ImageProcess::scaleImageToFactor);
+    connect(this,&ComicReader::imageToWindow,&imageProcess,&ImageProcess::scaleImageToWindow);
+    loadPagesThread.start();
+
     // Open archive
     open();
 }
@@ -39,6 +47,8 @@ ComicReader::~ComicReader()
     pageVector.clear();
     loadPagesThread.terminate();
     loadPagesThread.wait();
+    imageProcessThread.terminate();
+    imageProcessThread.wait();
     delete ui;
 }
 
@@ -87,7 +97,8 @@ void ComicReader::setPage()
 {
     qDebug()<<"setPage"<<"FitToWindow"<<fitToWindowAct->isChecked()<<"DoublePageMode"<<doublePageAct->isChecked();
     // Load images for this page and its neighbour pages
-    emit loadImages(pageIterator - pageVector.begin() +1);
+    pageNumber=pageIterator-pageVector.begin()+1;
+    emit loadImages(pageNumber);
     // Enable actions
     zoomInAct->setEnabled(true);
     zoomOutAct->setEnabled(true);
@@ -97,7 +108,10 @@ void ComicReader::setPage()
         while(!(pageIterator+1)->isLoaded()); // Wait second page to be loaded
     // Set pixmap
     if(!doublePageAct->isChecked() || pageIterator == pageVector.end()-1)     // Single page mode
+    {
         currentPixmap.convertFromImage(pageIterator->getImage());
+        pageIterator->setPixmap(currentPixmap);
+    }
     else{                  // Double pages mode
         int pageMargin = 30;
         int HEIGHT = qMax(pageIterator->getImage().height(), (pageIterator + 1)->getImage().height());
@@ -183,7 +197,9 @@ void ComicReader::scaleImage(double factor)
 {
     scaleFactor *= factor;
     qDebug()<<"scaleImage"<<scaleFactor;
-    centerLabel->setPixmap(currentPixmap.scaled(currentPixmap.size()*scaleFactor, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    emit imageToFactor(scaleFactor,pageNumber);
+    //while(pageIterator->getSacled()!=scaleFactor) ;
+    centerLabel->setPixmap(pageIterator->getPixmap());
     centerLabel->adjustSize();
     ui->scrollAreaWidgetContents->adjustSize();
     adjustScrollBar(centerScrollArea->horizontalScrollBar(), factor);
@@ -221,7 +237,9 @@ void ComicReader::triggerDoublePage()
 
 void ComicReader::scaleImageToWindow()
 {
-    centerLabel->setPixmap(currentPixmap.scaled(ui->centralWidget->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
+
+    emit imageToWindow(ui->centralWidget->size(),pageNumber);
+    centerLabel->setPixmap(pageIterator->getPixmap());
     centerLabel->adjustSize();
     ui->scrollAreaWidgetContents->adjustSize();
     // Update scaleFactor

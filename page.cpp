@@ -32,17 +32,26 @@ void Page::initParams()
 
 // Getter
 
+QPixmap Page::getPixmap(){return pixmap;}
+
 QImage Page::getImage(){ return image;}
 
 unsigned int Page::getPageNumber(){return pageNumber;}
 
 bool Page::isLoaded(){return loaded;}
 
+int Page::getSacled(){return scalefactor;}
+
 
 // Setter
+
+void Page::setPixmap(QPixmap _pixmap){pixmap=_pixmap;}
 
 void Page::setImage(QImage _image){image = _image;}
 
 void Page::setPageNumber(unsigned int number){pageNumber = number;}
 
 void Page::setLoaded(bool _loaded){loaded = _loaded;}
+
+void Page::setScaled(int factor){scalefactor=factor;}
+
