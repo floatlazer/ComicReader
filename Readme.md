@@ -27,6 +27,8 @@ We use [unarr](https://github.com/zeniko/unarr) library to uncompress archive be
 * Fit image to window or show the normal size of image
 * Double page mode
 
+***Note:*** Imageprocessing thread is currently not working, we continue to developing it.
+
 ## Compilation
 
 ### Prerequistes
@@ -37,6 +39,8 @@ We use [unarr](https://github.com/zeniko/unarr) library to uncompress archive be
 * GNU Make (To build *unarr* library)
 
 ## Build
+
+***Note:*** This application is only tested on mac OSX.
 
 ### Build unarr library
 
