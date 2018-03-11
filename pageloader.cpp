@@ -35,7 +35,7 @@ void PageLoader::loadImages(int pageNumber)
         }
     }
 
-    // Clean images loaded that are not in [pageNumber - 4, pageNumber + 5]
+    // Clean images loaded that are not in [pageNumber - 9, pageNumber + 10]
     for(int i = 0; i < pageLoaded.size(); i++)
     {
         int p = pageLoaded[i];

@@ -93,9 +93,9 @@ void ComicReader::setPage()
     zoomInAct->setEnabled(true);
     zoomOutAct->setEnabled(true);
     // Check if page is loaded, wait for page loading if not
-    while(!pageIterator->isLoaded());
+    while(!pageIterator->isLoaded()) QThread::msleep(1);
     if(doublePageAct->isChecked() && pageIterator < pageVector.end()-1)
-        while(!(pageIterator+1)->isLoaded()); // Wait second page to be loaded
+        while(!(pageIterator+1)->isLoaded()) QThread::msleep(1); // Wait second page to be loaded
     // Set pixmap
     if(!doublePageAct->isChecked() || pageIterator == pageVector.end()-1)     // Single page mode
         currentPixmap.convertFromImage(pageIterator->getImage());
