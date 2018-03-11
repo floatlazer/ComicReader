@@ -27,7 +27,7 @@ We use [unarr](https://github.com/zeniko/unarr) library to uncompress archive be
 * Fit image to window or show the normal size of image
 * Double page mode
 
-***Note:*** Imageprocessing thread is currently not working, we continue to developing it.
+***Note:*** Imageprocessing thread is currently not working, currently the resizing is done in GUI thread but we continue to developing it.
 
 ## Compilation
 
