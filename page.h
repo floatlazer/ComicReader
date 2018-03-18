@@ -14,16 +14,16 @@ public:
     // Getter
     QImage getImage();
     unsigned int getPageNumber();
-    bool isLoaded();
+    int isLoaded();
     // Setter
     void setImage(QImage _image);
     void setPageNumber(unsigned int number);
-    void setLoaded(bool _loaded);
+    void setLoaded(int _loaded);
 private:
     QImage image;
     unsigned int pageNumber;
     void initParams();
-    bool loaded; // Whether the page has been loaded
+    QAtomicInt loaded; // Whether the page has been loaded
 };
 
 #endif // PAGE_H

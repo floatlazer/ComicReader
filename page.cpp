@@ -27,7 +27,7 @@ Page::~Page()
 void Page::initParams()
 {
     pageNumber = 0;
-    loaded = false;
+    loaded = 0;
 }
 
 // Getter
@@ -36,7 +36,7 @@ QImage Page::getImage(){ return image;}
 
 unsigned int Page::getPageNumber(){return pageNumber;}
 
-bool Page::isLoaded(){return loaded;}
+int Page::isLoaded(){return loaded;}
 
 
 // Setter
@@ -45,4 +45,4 @@ void Page::setImage(QImage _image){image = _image;}
 
 void Page::setPageNumber(unsigned int number){pageNumber = number;}
 
-void Page::setLoaded(bool _loaded){loaded = _loaded;}
+void Page::setLoaded(int _loaded){loaded = _loaded;}
