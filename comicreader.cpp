@@ -16,9 +16,6 @@ ComicReader::ComicReader(QWidget *parent) :
     connect(&pageComboBox, QOverload<int>::of(&QComboBox::activated),[=](int index){qDebug()<<"page index change"; pageIterator = pageVector.begin() + index; setPage(); });
     centerLabel = ui->centerLabel;
     centerScrollArea = ui->centerScrollArea;
-    // Init params
-    scaleFactor = 1.0;
-    isFirstPage = true;
     // Create Actions
     createActions();
     doublePageAct->setEnabled(true);
@@ -68,6 +65,9 @@ void ComicReader::open()
     }
     // Load pages without loading images
     loadPages();
+    // Init params
+    scaleFactor = 1.0;
+    isFirstPage = true;
     // Show page
     setPage();
     isFirstPage = false;
